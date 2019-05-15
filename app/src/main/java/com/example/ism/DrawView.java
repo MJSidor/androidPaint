@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Build;
@@ -83,12 +84,41 @@ public class DrawView extends View {
             mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         } else {
             // w innym wypadku ustaw bitmapę na podstawie przeskalowanej do nowego wymiaru bitmapy pomocniczej
-            Bitmap bmp = Bitmap.createScaledBitmap(mBitmap, w,h,false);
+            Bitmap bmp = getResizedBitmap(mBitmap,w,h);
             mBitmap = bmp;
             restored = false;
         }
         // utwórz kanwę na podstawie bitmapy
         mCanvas = new Canvas(mBitmap);
+    }
+
+    /**
+     * Metoda pomocnicza służąca do uzyskania przeskalowanej bitmapy po obrocie urządzenia
+     * @param bitmap
+     * @param newWidth
+     * @param newHeight
+     * @return
+     */
+    public Bitmap getResizedBitmap(Bitmap bitmap, int newWidth, int newHeight) {
+
+        int width = bitmap.getWidth();
+        int height = bitmap.getHeight();
+
+        // oblicz współczynniki skalowania x,y
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+
+        // utwórz macierz
+        Matrix matrix = new Matrix();
+
+        // przeskaluj bitmapę
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // utwórz nową przeskalowaną bitmapę
+        Bitmap resizedBitmap = Bitmap.createBitmap(
+                bitmap, 0, 0, width, height, matrix, false);
+        bitmap.recycle();
+        return resizedBitmap;
     }
 
     @Override
