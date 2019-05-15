@@ -36,38 +36,48 @@ public class MainActivity extends Activity {
 
     }
 
+    /**
+     * Metoda pomocnicza dodająca przyciski, ich właściwości oraz layout do istniejącego layoutu
+     */
     public void addButtons() {
+
+        // nowy layout (kontener na przyciski)
         lLayout = new LinearLayout(this);
 
+        // uniwersalne parametry dla przycisków - width,height,weight
         LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 1.0f
         );
 
-
+        // tworzenie przycisków
         Button buttonRed = new Button(this);
         Button buttonBlue = new Button(this);
         Button buttonYellow = new Button(this);
         Button buttonGreen = new Button(this);
         Button buttonClear = new Button(this);
 
+        // ustawienie parametrów przycisków
         buttonRed.setLayoutParams(param);
         buttonBlue.setLayoutParams(param);
         buttonYellow.setLayoutParams(param);
         buttonGreen.setLayoutParams(param);
         buttonClear.setLayoutParams(param);
 
+        // ustawienie kolorów/tesktu przycisków
         buttonRed.setBackgroundColor(Color.RED);
         buttonBlue.setBackgroundColor(Color.BLUE);
         buttonYellow.setBackgroundColor(Color.YELLOW);
         buttonGreen.setBackgroundColor(Color.GREEN);
         buttonClear.setText("X");
 
+
+        // ustawienie listenerów na przyciskach
         buttonRed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawView.setPaintColor("red");
+                drawView.setPaintColor("red"); // zmiana koloru paint w obiekcie DrawView
             }
         });
 
@@ -99,30 +109,42 @@ public class MainActivity extends Activity {
             }
         });
 
+        // dodanie przycisków do layoutu
         lLayout.addView(buttonRed);
         lLayout.addView(buttonBlue);
         lLayout.addView(buttonYellow);
         lLayout.addView(buttonGreen);
         lLayout.addView(buttonClear);
 
-
+        // zagnieżdżenie (dodanie) layoutu z przyciskami w layoucie głównym
         cLayout.addView(lLayout);
     }
 
+    /**
+     * Metoda wywoływana przy obrocie urządzenia
+     * @param outState
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
 
+        // zapisz obecną bitmapę
         outState.putParcelable("bitmap", drawView.getmBitmap());
         super.onSaveInstanceState(outState);
-
-
     }
 
+    /**
+     * Metoda wywoływana po obróceniu urządzenia
+     * @param savedInstanceState
+     */
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
 
         Bitmap bmp = savedInstanceState.getParcelable("bitmap");
+
+        // ustaw zapisaną bitmapę w obiekcie drawView
         drawView.setmBitmap(bmp);
+
+        // ustaw zmienną logiczną drawView dotyczącą przywracania bitmapy po obrocie
         drawView.restored = true;
         super.onRestoreInstanceState(savedInstanceState);
     }

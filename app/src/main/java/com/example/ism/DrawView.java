@@ -22,7 +22,8 @@ public class DrawView extends View {
     private Path mPath;
     private Paint mBitmapPaint;
     private Paint mPaint;
-    protected boolean restored = false;
+    protected boolean restored = false; // zmienna pomocnicza służąca do określania,
+    // czy urządzenie zostało właśnie obrócone
 
     public DrawView(Context context, Bitmap mBitmap) {
         super(context);
@@ -51,7 +52,8 @@ public class DrawView extends View {
     }
 
     /**
-     * Metoda pomocnicza inicjalizująca 
+     * Metoda pomocnicza inicjalizująca zmienne widoku - ścieżka, paint + wartości
+     * Używana w konstruktorach
      */
     public void init() {
         mPath = new Path();
