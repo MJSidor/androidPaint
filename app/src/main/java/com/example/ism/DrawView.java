@@ -111,10 +111,10 @@ public class DrawView extends View {
         // utwórz macierz
         Matrix matrix = new Matrix();
 
-        // przeskaluj bitmapę
+        // wprowadź do macierzy współczynniki skalowania x,y
         matrix.postScale(scaleWidth, scaleHeight);
 
-        // utwórz nową przeskalowaną bitmapę
+        // utwórz nową, przeskalowaną na podstawie macierzy, bitmapę
         Bitmap resizedBitmap = Bitmap.createBitmap(
                 bitmap, 0, 0, width, height, matrix, false);
         bitmap.recycle();
