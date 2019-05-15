@@ -122,6 +122,7 @@ public class MainActivity extends Activity {
 
     /**
      * Metoda wywoływana przy obrocie urządzenia
+     *
      * @param outState
      */
     @Override
@@ -134,6 +135,7 @@ public class MainActivity extends Activity {
 
     /**
      * Metoda wywoływana po obróceniu urządzenia
+     *
      * @param savedInstanceState
      */
     @Override

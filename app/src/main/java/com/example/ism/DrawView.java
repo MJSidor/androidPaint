@@ -69,6 +69,7 @@ public class DrawView extends View {
 
     /**
      * Metoda wywoływana przy zmianie rozmiaru widoku, a więc też przy uruchomieniu aplikacji.
+     *
      * @param w
      * @param h
      * @param oldw
@@ -84,7 +85,7 @@ public class DrawView extends View {
             mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         } else {
             // w innym wypadku ustaw bitmapę na podstawie przeskalowanej do nowego wymiaru bitmapy pomocniczej
-            Bitmap bmp = getResizedBitmap(mBitmap,w,h);
+            Bitmap bmp = getResizedBitmap(mBitmap, w, h);
             mBitmap = bmp;
             restored = false;
         }
@@ -94,6 +95,7 @@ public class DrawView extends View {
 
     /**
      * Metoda pomocnicza służąca do uzyskania przeskalowanej bitmapy po obrocie urządzenia
+     *
      * @param bitmap
      * @param newWidth
      * @param newHeight
@@ -218,6 +220,7 @@ public class DrawView extends View {
 
     /**
      * Getter dla bitmapy wykorzystywany do save/restoreInstanceState w mainActivity
+     *
      * @return
      */
     public Bitmap getmBitmap() {
@@ -226,6 +229,7 @@ public class DrawView extends View {
 
     /**
      * Setter dla bitmapy wykorzystywany do save/restoreInstanceState w mainActivity
+     *
      * @param mBitmap
      */
     public void setmBitmap(Bitmap mBitmap) {
