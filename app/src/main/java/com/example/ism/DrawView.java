@@ -82,7 +82,9 @@ public class DrawView extends View {
         if (!restored) {
             mBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         } else {
-            // w innym wypadku bitmapa jest już ustawiona przez metodę onRestoreInstanceState mainActivity
+            // w innym wypadku ustaw bitmapę na podstawie przeskalowanej do nowego wymiaru bitmapy pomocniczej
+            Bitmap bmp = Bitmap.createScaledBitmap(mBitmap, w,h,false);
+            mBitmap = bmp;
             restored = false;
         }
         // utwórz kanwę na podstawie bitmapy
