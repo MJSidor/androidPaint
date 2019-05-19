@@ -67,32 +67,23 @@ public class MainActivity extends Activity {
         );
 
         // tworzenie przycisków
-        Button buttonRed = new Button(this);
-        Button buttonBlue = new Button(this);
-        Button buttonYellow = new Button(this);
-        Button buttonGreen = new Button(this);
+        Button buttonColor = new Button(this);
         Button buttonClear = new Button(this);
         Button buttonWidth = new Button(this);
 
         // ustawienie parametrów przycisków
-        buttonRed.setLayoutParams(param);
-        buttonBlue.setLayoutParams(param);
-        buttonYellow.setLayoutParams(param);
-        buttonGreen.setLayoutParams(param);
+        buttonColor.setLayoutParams(param);
         buttonClear.setLayoutParams(param);
         buttonWidth.setLayoutParams(param);
 
         // ustawienie kolorów/tesktu przycisków
-        buttonRed.setBackgroundColor(Color.RED);
-        buttonBlue.setBackgroundColor(Color.BLUE);
-        buttonYellow.setBackgroundColor(Color.YELLOW);
-        buttonGreen.setBackgroundColor(Color.GREEN);
+        buttonColor.setText("C");
         buttonClear.setText("X");
         buttonWidth.setText("W");
 
 
         // ustawienie listenerów na przyciskach
-        buttonRed.setOnClickListener(new View.OnClickListener() {
+        buttonColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                // drawView.setPaintColor("red"); // zmiana koloru paint w obiekcie DrawView
@@ -105,13 +96,12 @@ public class MainActivity extends Activity {
                         .setOnColorSelectedListener(new OnColorSelectedListener() {
                             @Override
                             public void onColorSelected(int selectedColor) {
-                                Toast.makeText(MainActivity.this, "onColorSelected: 0x" + Integer.toHexString(selectedColor), Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(MainActivity.this, "onColorSelected: 0x" + Integer.toHexString(selectedColor), Toast.LENGTH_SHORT).show();
                             }
                         })
                         .setPositiveButton("OK", new ColorPickerClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                                //changeBackgroundColor(selectedColor);
                                 drawView.setPaintColor(selectedColor);
                             }
                         })
@@ -138,15 +128,11 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
 
                 showWidthDialog();
-
             }
         });
 
         // dodanie przycisków do layoutu
-        lLayout.addView(buttonRed);
-        lLayout.addView(buttonBlue);
-        lLayout.addView(buttonYellow);
-        lLayout.addView(buttonGreen);
+        lLayout.addView(buttonColor);
         lLayout.addView(buttonClear);
         lLayout.addView(buttonWidth);
 
