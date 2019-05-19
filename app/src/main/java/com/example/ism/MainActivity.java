@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
@@ -22,6 +23,8 @@ import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+
+import java.util.ArrayList;
 
 import javax.xml.datatype.Duration;
 
@@ -67,62 +70,41 @@ public class MainActivity extends Activity {
         );
 
         // tworzenie przycisków
-        Button buttonColor = new Button(this);
-        Button buttonClear = new Button(this);
-        Button buttonWidth = new Button(this);
+        Button buttonStrokeColor = new Button(this);
+        Button buttonClearScreen = new Button(this);
+        Button buttonStrokeWidth = new Button(this);
+        Button buttonTool = new Button(this);
 
         // ustawienie parametrów przycisków
-        buttonColor.setLayoutParams(param);
-        buttonClear.setLayoutParams(param);
-        buttonWidth.setLayoutParams(param);
+        buttonStrokeColor.setLayoutParams(param);
+        buttonClearScreen.setLayoutParams(param);
+        buttonStrokeWidth.setLayoutParams(param);
+        buttonStrokeWidth.setLayoutParams(param);
 
         // ustawienie kolorów/tesktu przycisków
-        buttonColor.setText("C");
-        buttonClear.setText("X");
-        buttonWidth.setText("W");
+        buttonStrokeColor.setText("C");
+        buttonClearScreen.setText("X");
+        buttonStrokeWidth.setText("W");
+        buttonTool.setText("T");
 
 
         // ustawienie listenerów na przyciskach
-        buttonColor.setOnClickListener(new View.OnClickListener() {
+        buttonStrokeColor.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               // drawView.setPaintColor("red"); // zmiana koloru paint w obiekcie DrawView
-                ColorPickerDialogBuilder
-                        .with(MainActivity.this)
-                        .setTitle("Choose color")
-                        .initialColor(Color.RED)
-                        .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
-                        .density(12)
-                        .setOnColorSelectedListener(new OnColorSelectedListener() {
-                            @Override
-                            public void onColorSelected(int selectedColor) {
-                                //Toast.makeText(MainActivity.this, "onColorSelected: 0x" + Integer.toHexString(selectedColor), Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .setPositiveButton("OK", new ColorPickerClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                                drawView.setStrokeColor(selectedColor);
-                            }
-                        })
-                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                            }
-                        })
-                        .build()
-                        .show();
+
+                showColorPicker();
             }
         });
 
-        buttonClear.setOnClickListener(new View.OnClickListener() {
+        buttonClearScreen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 drawView.clearScreen();
             }
         });
 
-        buttonWidth.setOnClickListener(new View.OnClickListener() {
+        buttonStrokeWidth.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
@@ -131,10 +113,43 @@ public class MainActivity extends Activity {
             }
         });
 
+        buttonTool.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String[] tools = {"Brush", "Filler", "Stroke and fill"};
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setTitle("Select a tool")
+                        .setItems(tools, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                switch (which) {
+                                    case 0:
+                                        drawView.setStrokeStyle(Paint.Style.STROKE);
+                                        break;
+
+                                    case 1:
+                                        drawView.setStrokeStyle(Paint.Style.FILL);
+                                        break;
+
+                                    case 2:
+                                        drawView.setStrokeStyle(Paint.Style.FILL_AND_STROKE);
+                                        break;
+                                }
+                            }
+                        });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+            }
+        });
+
         // dodanie przycisków do layoutu
-        lLayout.addView(buttonColor);
-        lLayout.addView(buttonClear);
-        lLayout.addView(buttonWidth);
+        lLayout.addView(buttonStrokeColor);
+        lLayout.addView(buttonClearScreen);
+        lLayout.addView(buttonStrokeWidth);
+        lLayout.addView(buttonTool);
 
         // zagnieżdżenie (dodanie) layoutu z przyciskami w layoucie głównym
         cLayout.addView(lLayout);
@@ -177,7 +192,6 @@ public class MainActivity extends Activity {
         });
 
 
-
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 drawView.setStrokeWidth(brushWidth);
@@ -191,6 +205,34 @@ public class MainActivity extends Activity {
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    public void showColorPicker() {
+        ColorPickerDialogBuilder
+                .with(MainActivity.this)
+                .setTitle("Choose color")
+                .initialColor(Color.RED)
+                .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                .density(12)
+                .setOnColorSelectedListener(new OnColorSelectedListener() {
+                    @Override
+                    public void onColorSelected(int selectedColor) {
+                        //Toast.makeText(MainActivity.this, "onColorSelected: 0x" + Integer.toHexString(selectedColor), Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setPositiveButton("OK", new ColorPickerClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
+                        drawView.setStrokeColor(selectedColor);
+                    }
+                })
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                })
+                .build()
+                .show();
     }
 
     /**

@@ -172,7 +172,7 @@ public class DrawView extends View {
         switch (event.getAction()) {
             // początek dotknięcia
             case MotionEvent.ACTION_DOWN:
-                resetPathAndDrawCircle(event.getX(), event.getY());
+                mPath.reset();
                 mPath.moveTo(event.getX(), event.getY()); //ustal współrzędne początkowe ściężki na miejsce dotknięcia
                 invalidate();
                 break;
@@ -183,22 +183,11 @@ public class DrawView extends View {
                 break;
             case MotionEvent.ACTION_UP:
                 // po oderwaniu palca od ekranu - zresetuj współrzędne ścieżki oraz narysuj okrąg
-                resetPathAndDrawCircle(event.getX(), event.getY());
+                mPath.reset();
                 invalidate();
                 break;
         }
         return true;
-    }
-
-    /**
-     * Metoda ustawiająca kolor pędzla
-     *
-     * @param color
-     */
-    public void setPaintColor(int color) {
-
-        mPaint.setColor(color);
-
     }
 
     public void setStrokeWidth(int strokeWidth) {
@@ -222,6 +211,11 @@ public class DrawView extends View {
     public void setStrokeColor(int strokeColor) {
         this.strokeColor = strokeColor;
         mPaint.setColor(this.strokeColor);
+    }
+
+    public void setStrokeStyle(Paint.Style style)
+    {
+        mPaint.setStyle(style);
     }
 
     /**
