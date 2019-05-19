@@ -23,6 +23,8 @@ public class DrawView extends View {
     private Path mPath;
     private Paint mBitmapPaint;
     private Paint mPaint;
+    private int strokeWidth;
+
     protected boolean restored = false; // zmienna pomocnicza służąca do określania,
     // czy urządzenie zostało właśnie obrócone
 
@@ -59,10 +61,11 @@ public class DrawView extends View {
     public void init() {
         mPath = new Path();
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+        strokeWidth = 8;
 
         mPaint = new Paint();
         mPaint.setColor(Color.BLUE);
-        mPaint.setStrokeWidth(8);
+        mPaint.setStrokeWidth(strokeWidth);
         mPaint.setStyle(Paint.Style.FILL);
         mPaint.setStyle(Paint.Style.STROKE);
     }
@@ -208,13 +211,18 @@ public class DrawView extends View {
 
     }
 
+    public void setStrokeWidth(int strokeWidth) {
+        this.strokeWidth = strokeWidth;
+        mPaint.setStrokeWidth(this.strokeWidth);
+    }
+
     /**
-     * Metoda ustawiająca szerokość pędzla
-     * @param width
+     * Metoda zwracająca szerokość pędzla
+     *
+     * @return
      */
-    public void setPaintWidth(int width)
-    {
-        mPaint.setStrokeWidth(width);
+    public int getStrokeWidth() {
+        return strokeWidth;
     }
 
     /**

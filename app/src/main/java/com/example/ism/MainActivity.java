@@ -5,13 +5,17 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Layout;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
 public class MainActivity extends Activity {
 
@@ -20,6 +24,7 @@ public class MainActivity extends Activity {
     ConstraintLayout cLayout;
     LinearLayout lLayout;
     Bitmap bmp;
+    int brushWidth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,29 +120,11 @@ public class MainActivity extends Activity {
         });
 
         buttonWidth.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onClick(View v) {
-                // 1. Instantiate an <code><a href="/reference/android/app/AlertDialog.Builder.html">AlertDialog.Builder</a></code> with its constructor
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 
-                builder.setMessage("razdwatrzy")
-                        .setTitle("trzydwaraz");
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User clicked OK button
-                    }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User cancelled the dialog
-                    }
-                });
-
-
-
-                // 3. Get the <code><a href="/reference/android/app/AlertDialog.html">AlertDialog</a></code> from <code><a href="/reference/android/app/AlertDialog.Builder.html#create()">create()</a></code>
-                AlertDialog dialog = builder.create();
-                dialog.show();
+                showWidthDialog();
 
             }
         });
@@ -152,6 +139,59 @@ public class MainActivity extends Activity {
 
         // zagnieżdżenie (dodanie) layoutu z przyciskami w layoucie głównym
         cLayout.addView(lLayout);
+    }
+
+
+    /**
+     * Metoda wyświetlająca dialog z edycją grubości pędzla
+     */
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void showWidthDialog() {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+        builder.setMessage("Current value: " + Integer.toString(drawView.getStrokeWidth()))
+                .setTitle("Adjust brush width");
+
+        SeekBar widthSeekBar = new SeekBar(this);
+        widthSeekBar.setMax(100);
+        widthSeekBar.setMin(1);
+        widthSeekBar.setKeyProgressIncrement(1);
+        widthSeekBar.setProgress(drawView.getStrokeWidth());
+
+        builder.setView(widthSeekBar);
+
+        widthSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                brushWidth = progress;
+                builder.setMessage("Current value: " + Integer.toString(progress));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                drawView.setStrokeWidth(brushWidth);
+            }
+        });
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                // User cancelled the dialog
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
     }
 
     /**
