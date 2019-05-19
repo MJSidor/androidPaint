@@ -16,6 +16,14 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.flask.colorpicker.ColorPickerView;
+import com.flask.colorpicker.OnColorSelectedListener;
+import com.flask.colorpicker.builder.ColorPickerClickListener;
+import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+
+import javax.xml.datatype.Duration;
 
 public class MainActivity extends Activity {
 
@@ -87,28 +95,33 @@ public class MainActivity extends Activity {
         buttonRed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawView.setPaintColor("red"); // zmiana koloru paint w obiekcie DrawView
-            }
-        });
-
-        buttonBlue.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawView.setPaintColor("blue");
-            }
-        });
-
-        buttonYellow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawView.setPaintColor("yellow");
-            }
-        });
-
-        buttonGreen.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                drawView.setPaintColor("green");
+               // drawView.setPaintColor("red"); // zmiana koloru paint w obiekcie DrawView
+                ColorPickerDialogBuilder
+                        .with(MainActivity.this)
+                        .setTitle("Choose color")
+                        .initialColor(Color.RED)
+                        .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
+                        .density(12)
+                        .setOnColorSelectedListener(new OnColorSelectedListener() {
+                            @Override
+                            public void onColorSelected(int selectedColor) {
+                                Toast.makeText(MainActivity.this, "onColorSelected: 0x" + Integer.toHexString(selectedColor), Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .setPositiveButton("OK", new ColorPickerClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
+                                //changeBackgroundColor(selectedColor);
+                                drawView.setPaintColor(selectedColor);
+                            }
+                        })
+                        .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        })
+                        .build()
+                        .show();
             }
         });
 

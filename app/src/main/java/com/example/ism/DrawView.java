@@ -193,21 +193,9 @@ public class DrawView extends View {
      *
      * @param color
      */
-    public void setPaintColor(String color) {
-        switch (color) {
-            case "red":
-                mPaint.setColor(Color.RED);
-                break;
-            case "blue":
-                mPaint.setColor(Color.BLUE);
-                break;
-            case "yellow":
-                mPaint.setColor(Color.YELLOW);
-                break;
-            case "green":
-                mPaint.setColor(Color.GREEN);
-                break;
-        }
+    public void setPaintColor(int color) {
+
+        mPaint.setColor(color);
 
     }
 
