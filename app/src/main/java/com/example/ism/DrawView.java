@@ -209,6 +209,15 @@ public class DrawView extends View {
     }
 
     /**
+     * Metoda ustawiająca szerokość pędzla
+     * @param width
+     */
+    public void setPaintWidth(int width)
+    {
+        mPaint.setStrokeWidth(width);
+    }
+
+    /**
      * Metoda wykorzystywana do wyczyszczenia ekranu
      */
     public void clearScreen() {

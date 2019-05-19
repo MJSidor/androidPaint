@@ -1,6 +1,8 @@
 package com.example.ism;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -57,6 +59,7 @@ public class MainActivity extends Activity {
         Button buttonYellow = new Button(this);
         Button buttonGreen = new Button(this);
         Button buttonClear = new Button(this);
+        Button buttonWidth = new Button(this);
 
         // ustawienie parametrów przycisków
         buttonRed.setLayoutParams(param);
@@ -64,6 +67,7 @@ public class MainActivity extends Activity {
         buttonYellow.setLayoutParams(param);
         buttonGreen.setLayoutParams(param);
         buttonClear.setLayoutParams(param);
+        buttonWidth.setLayoutParams(param);
 
         // ustawienie kolorów/tesktu przycisków
         buttonRed.setBackgroundColor(Color.RED);
@@ -71,6 +75,7 @@ public class MainActivity extends Activity {
         buttonYellow.setBackgroundColor(Color.YELLOW);
         buttonGreen.setBackgroundColor(Color.GREEN);
         buttonClear.setText("X");
+        buttonWidth.setText("W");
 
 
         // ustawienie listenerów na przyciskach
@@ -109,12 +114,41 @@ public class MainActivity extends Activity {
             }
         });
 
+        buttonWidth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // 1. Instantiate an <code><a href="/reference/android/app/AlertDialog.Builder.html">AlertDialog.Builder</a></code> with its constructor
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+
+                builder.setMessage("razdwatrzy")
+                        .setTitle("trzydwaraz");
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User clicked OK button
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // User cancelled the dialog
+                    }
+                });
+
+
+
+                // 3. Get the <code><a href="/reference/android/app/AlertDialog.html">AlertDialog</a></code> from <code><a href="/reference/android/app/AlertDialog.Builder.html#create()">create()</a></code>
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+            }
+        });
+
         // dodanie przycisków do layoutu
         lLayout.addView(buttonRed);
         lLayout.addView(buttonBlue);
         lLayout.addView(buttonYellow);
         lLayout.addView(buttonGreen);
         lLayout.addView(buttonClear);
+        lLayout.addView(buttonWidth);
 
         // zagnieżdżenie (dodanie) layoutu z przyciskami w layoucie głównym
         cLayout.addView(lLayout);
