@@ -102,7 +102,7 @@ public class MainActivity extends Activity {
                         .setPositiveButton("OK", new ColorPickerClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int selectedColor, Integer[] allColors) {
-                                drawView.setPaintColor(selectedColor);
+                                drawView.setStrokeColor(selectedColor);
                             }
                         })
                         .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -203,6 +203,8 @@ public class MainActivity extends Activity {
 
         // zapisz obecną bitmapę
         outState.putParcelable("bitmap", drawView.getmBitmap());
+        outState.putInt("strokeWidth", drawView.getStrokeWidth());
+        outState.putInt("strokeColor", drawView.getStrokeColor());
         super.onSaveInstanceState(outState);
     }
 
@@ -215,12 +217,17 @@ public class MainActivity extends Activity {
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
 
         Bitmap bmp = savedInstanceState.getParcelable("bitmap");
+        int strokeWidth = savedInstanceState.getInt("strokeWidth");
+        int strokeColor = savedInstanceState.getInt("strokeColor");
 
         // ustaw zapisaną bitmapę w obiekcie drawView
         drawView.setmBitmap(bmp);
 
         // ustaw zmienną logiczną drawView dotyczącą przywracania bitmapy po obrocie
         drawView.restored = true;
+
+        drawView.setStrokeColor(strokeColor);
+        drawView.setStrokeWidth(strokeWidth);
         super.onRestoreInstanceState(savedInstanceState);
     }
 }
