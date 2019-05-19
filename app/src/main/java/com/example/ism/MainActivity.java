@@ -117,31 +117,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-                String[] tools = {"Brush", "Filler", "Stroke and fill"};
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setTitle("Select a tool")
-                        .setItems(tools, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-
-                                switch (which) {
-                                    case 0:
-                                        drawView.setStrokeStyle(Paint.Style.STROKE);
-                                        break;
-
-                                    case 1:
-                                        drawView.setStrokeStyle(Paint.Style.FILL);
-                                        break;
-
-                                    case 2:
-                                        drawView.setStrokeStyle(Paint.Style.FILL_AND_STROKE);
-                                        break;
-                                }
-                            }
-                        });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-
+            showToolPicker();
             }
         });
 
@@ -235,6 +211,34 @@ public class MainActivity extends Activity {
                 .show();
     }
 
+    public void showToolPicker()
+    {
+        String[] tools = {"Brush", "Filler", "Stroke and fill"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Select a tool")
+                .setItems(tools, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        switch (which) {
+                            case 0:
+                                drawView.setStrokeStyle(Paint.Style.STROKE);
+                                break;
+
+                            case 1:
+                                drawView.setStrokeStyle(Paint.Style.FILL);
+                                break;
+
+                            case 2:
+                                drawView.setStrokeStyle(Paint.Style.FILL_AND_STROKE);
+                                break;
+                        }
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     /**
      * Metoda wywoływana przy obrocie urządzenia
      *
@@ -247,6 +251,9 @@ public class MainActivity extends Activity {
         outState.putParcelable("bitmap", drawView.getmBitmap());
         outState.putInt("strokeWidth", drawView.getStrokeWidth());
         outState.putInt("strokeColor", drawView.getStrokeColor());
+
+        // outState.putString("strokeStyle", drawView.getStyle());
+
         super.onSaveInstanceState(outState);
     }
 

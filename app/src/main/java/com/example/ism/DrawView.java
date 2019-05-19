@@ -25,6 +25,7 @@ public class DrawView extends View {
     private Paint mPaint;
     private int strokeWidth;
     private int strokeColor;
+    private Paint.Style style;
 
     protected boolean restored = false; // zmienna pomocnicza służąca do określania,
     // czy urządzenie zostało właśnie obrócone
@@ -64,12 +65,13 @@ public class DrawView extends View {
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         strokeWidth = 8;
         strokeColor = Color.BLUE;
+        style = Paint.Style.STROKE;
 
         mPaint = new Paint();
         mPaint.setColor(strokeColor);
         mPaint.setStrokeWidth(strokeWidth);
         mPaint.setStyle(Paint.Style.FILL);
-        mPaint.setStyle(Paint.Style.STROKE);
+        mPaint.setStyle(style);
     }
 
     /**
@@ -216,6 +218,15 @@ public class DrawView extends View {
     public void setStrokeStyle(Paint.Style style)
     {
         mPaint.setStyle(style);
+    }
+
+    public Paint.Style getStyle() {
+        return style;
+    }
+
+    public void setStyle(Paint.Style style) {
+        this.style = style;
+        mPaint.setStyle(this.style);
     }
 
     /**
