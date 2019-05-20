@@ -220,19 +220,7 @@ public class MainActivity extends Activity {
                 .setItems(tools, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 
-                        switch (which) {
-                            case 0:
-                                drawView.setStrokeStyle(Paint.Style.STROKE);
-                                break;
-
-                            case 1:
-                                drawView.setStrokeStyle(Paint.Style.FILL);
-                                break;
-
-                            case 2:
-                                drawView.setStrokeStyle(Paint.Style.FILL_AND_STROKE);
-                                break;
-                        }
+                        drawView.setStyle(which);
                     }
                 });
         AlertDialog dialog = builder.create();
@@ -251,8 +239,7 @@ public class MainActivity extends Activity {
         outState.putParcelable("bitmap", drawView.getmBitmap());
         outState.putInt("strokeWidth", drawView.getStrokeWidth());
         outState.putInt("strokeColor", drawView.getStrokeColor());
-
-        // outState.putString("strokeStyle", drawView.getStyle());
+        outState.putInt("strokeStyle", drawView.getStyle());
 
         super.onSaveInstanceState(outState);
     }
@@ -268,6 +255,7 @@ public class MainActivity extends Activity {
         Bitmap bmp = savedInstanceState.getParcelable("bitmap");
         int strokeWidth = savedInstanceState.getInt("strokeWidth");
         int strokeColor = savedInstanceState.getInt("strokeColor");
+        int strokeStyle = savedInstanceState.getInt("strokeStyle");
 
         // ustaw zapisaną bitmapę w obiekcie drawView
         drawView.setmBitmap(bmp);
@@ -277,6 +265,8 @@ public class MainActivity extends Activity {
 
         drawView.setStrokeColor(strokeColor);
         drawView.setStrokeWidth(strokeWidth);
+        drawView.setStyle(strokeStyle);
+
         super.onRestoreInstanceState(savedInstanceState);
     }
 }

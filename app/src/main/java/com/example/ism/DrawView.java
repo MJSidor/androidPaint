@@ -25,7 +25,7 @@ public class DrawView extends View {
     private Paint mPaint;
     private int strokeWidth;
     private int strokeColor;
-    private Paint.Style style;
+    private Paint.Style strokeStyle;
 
     protected boolean restored = false; // zmienna pomocnicza służąca do określania,
     // czy urządzenie zostało właśnie obrócone
@@ -65,13 +65,13 @@ public class DrawView extends View {
         mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         strokeWidth = 8;
         strokeColor = Color.BLUE;
-        style = Paint.Style.STROKE;
+        strokeStyle = Paint.Style.STROKE;
 
         mPaint = new Paint();
         mPaint.setColor(strokeColor);
         mPaint.setStrokeWidth(strokeWidth);
         mPaint.setStyle(Paint.Style.FILL);
-        mPaint.setStyle(style);
+        mPaint.setStyle(strokeStyle);
     }
 
     /**
@@ -215,18 +215,28 @@ public class DrawView extends View {
         mPaint.setColor(this.strokeColor);
     }
 
-    public void setStrokeStyle(Paint.Style style)
-    {
-        mPaint.setStyle(style);
+    public int getStyle() {
+
+        if (this.strokeStyle == Paint.Style.STROKE) return 0;
+        if (this.strokeStyle == Paint.Style.FILL) return 1;
+        if (this.strokeStyle == Paint.Style.FILL_AND_STROKE) return 2;
+
+        else return -1;
     }
 
-    public Paint.Style getStyle() {
-        return style;
-    }
-
-    public void setStyle(Paint.Style style) {
-        this.style = style;
-        mPaint.setStyle(this.style);
+    public void setStyle(int style) {
+        switch (style) {
+            case 0:
+                this.strokeStyle=Paint.Style.STROKE;
+                break;
+            case 1:
+                this.strokeStyle=Paint.Style.FILL;
+                break;
+            case 2:
+                this.strokeStyle=Paint.Style.FILL_AND_STROKE;
+                break;
+        }
+        mPaint.setStyle(this.strokeStyle);
     }
 
     /**
