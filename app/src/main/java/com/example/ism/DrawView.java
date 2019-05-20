@@ -74,6 +74,17 @@ public class DrawView extends View {
         mPaint.setStyle(strokeStyle);
     }
 
+    public void loadBitmapFromFile(Bitmap bmp)
+    {
+        // w innym wypadku ustaw bitmapę na podstawie przeskalowanej do nowego wymiaru bitmapy pomocniczej
+        Bitmap bitmap = getResizedBitmap(bmp, getWidth(), getHeight());
+        mBitmap = bitmap;
+        restored = false;
+
+        // utwórz kanwę na podstawie bitmapy
+        mCanvas = new Canvas(mBitmap);
+    }
+
     /**
      * Metoda wywoływana przy zmianie rozmiaru widoku, a więc też przy uruchomieniu aplikacji.
      *

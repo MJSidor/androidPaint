@@ -3,15 +3,21 @@ package com.example.ism;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.ParcelFileDescriptor;
 import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Layout;
+import android.util.Log;
+import android.util.Size;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -24,6 +30,8 @@ import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
+import java.io.FileDescriptor;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.xml.datatype.Duration;
@@ -36,6 +44,7 @@ public class MainActivity extends Activity {
     LinearLayout lLayout;
     Bitmap bmp;
     int brushWidth;
+    boolean fileOpen = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,18 +83,21 @@ public class MainActivity extends Activity {
         Button buttonClearScreen = new Button(this);
         Button buttonStrokeWidth = new Button(this);
         Button buttonTool = new Button(this);
+        Button buttonOpenFile = new Button(this);
 
         // ustawienie parametrów przycisków
         buttonStrokeColor.setLayoutParams(param);
         buttonClearScreen.setLayoutParams(param);
         buttonStrokeWidth.setLayoutParams(param);
-        buttonStrokeWidth.setLayoutParams(param);
+        buttonTool.setLayoutParams(param);
+        buttonOpenFile.setLayoutParams(param);
 
         // ustawienie kolorów/tesktu przycisków
         buttonStrokeColor.setText("C");
         buttonClearScreen.setText("X");
         buttonStrokeWidth.setText("W");
         buttonTool.setText("T");
+        buttonOpenFile.setText("O");
 
 
         // ustawienie listenerów na przyciskach
@@ -117,7 +129,16 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-            showToolPicker();
+                showToolPicker();
+            }
+        });
+
+        buttonOpenFile.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+
+                performFileSearch();
             }
         });
 
@@ -126,6 +147,7 @@ public class MainActivity extends Activity {
         lLayout.addView(buttonClearScreen);
         lLayout.addView(buttonStrokeWidth);
         lLayout.addView(buttonTool);
+        lLayout.addView(buttonOpenFile);
 
         // zagnieżdżenie (dodanie) layoutu z przyciskami w layoucie głównym
         cLayout.addView(lLayout);
@@ -211,8 +233,7 @@ public class MainActivity extends Activity {
                 .show();
     }
 
-    public void showToolPicker()
-    {
+    public void showToolPicker() {
         String[] tools = {"Brush", "Filler", "Stroke and fill"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -235,11 +256,15 @@ public class MainActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
 
-        // zapisz obecną bitmapę
-        outState.putParcelable("bitmap", drawView.getmBitmap());
         outState.putInt("strokeWidth", drawView.getStrokeWidth());
         outState.putInt("strokeColor", drawView.getStrokeColor());
         outState.putInt("strokeStyle", drawView.getStyle());
+
+        if (!fileOpen) {
+
+            // zapisz obecną bitmapę
+            outState.putParcelable("bitmap", drawView.getmBitmap());
+        }
 
         super.onSaveInstanceState(outState);
     }
@@ -252,21 +277,82 @@ public class MainActivity extends Activity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
 
-        Bitmap bmp = savedInstanceState.getParcelable("bitmap");
-        int strokeWidth = savedInstanceState.getInt("strokeWidth");
-        int strokeColor = savedInstanceState.getInt("strokeColor");
-        int strokeStyle = savedInstanceState.getInt("strokeStyle");
+        if (!fileOpen) {
 
-        // ustaw zapisaną bitmapę w obiekcie drawView
-        drawView.setmBitmap(bmp);
+            int strokeWidth = savedInstanceState.getInt("strokeWidth");
+            int strokeColor = savedInstanceState.getInt("strokeColor");
+            int strokeStyle = savedInstanceState.getInt("strokeStyle");
 
-        // ustaw zmienną logiczną drawView dotyczącą przywracania bitmapy po obrocie
-        drawView.restored = true;
+            drawView.setStrokeColor(strokeColor);
+            drawView.setStrokeWidth(strokeWidth);
+            drawView.setStyle(strokeStyle);
+            Bitmap bmp = savedInstanceState.getParcelable("bitmap");
+            // ustaw zapisaną bitmapę w obiekcie drawView
+            drawView.setmBitmap(bmp);
 
-        drawView.setStrokeColor(strokeColor);
-        drawView.setStrokeWidth(strokeWidth);
-        drawView.setStyle(strokeStyle);
+            // ustaw zmienną logiczną drawView dotyczącą przywracania bitmapy po obrocie
+            drawView.restored = true;
+        }
+
+
 
         super.onRestoreInstanceState(savedInstanceState);
     }
+
+
+    private static final int READ_REQUEST_CODE = 42;
+
+    /**
+     * Fires an intent to spin up the "file chooser" UI and select an image.
+     */
+    public void performFileSearch() {
+
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        intent.setType("image/*");
+
+        startActivityForResult(intent, READ_REQUEST_CODE);
+
+        this.fileOpen = true;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode,
+                                 Intent resultData) {
+
+        if (requestCode == READ_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            // The document selected by the user won't be returned in the intent.
+            // Instead, a URI to that document will be contained in the return intent
+            // provided to this method as a parameter.
+            // Pull that URI using resultData.getData().
+            Uri uri = null;
+            if (resultData != null) {
+                uri = resultData.getData();
+
+                try {
+                    drawView.loadBitmapFromFile(getBitmapFromUri(uri));
+                    this.fileOpen = false;
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }
+    }
+
+    private Bitmap getBitmapFromUri(Uri uri) throws IOException {
+
+        ParcelFileDescriptor parcelFileDescriptor =
+                getContentResolver().openFileDescriptor(uri, "r");
+        FileDescriptor fileDescriptor = parcelFileDescriptor.getFileDescriptor();
+        Bitmap image = BitmapFactory.decodeFileDescriptor(fileDescriptor);
+        parcelFileDescriptor.close();
+
+        return image;
+    }
+
+
 }
