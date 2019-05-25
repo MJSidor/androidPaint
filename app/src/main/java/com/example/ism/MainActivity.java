@@ -348,6 +348,7 @@ public class MainActivity extends Activity {
             outState.putInt("strokeWidth", drawView.getStrokeWidth());
             outState.putInt("strokeColor", drawView.getStrokeColor());
             outState.putInt("strokeStyle", drawView.getStyle());
+            outState.putString("shape", drawView.getShape());
         }
 
         if (!fileOpen && !camera) {
@@ -372,10 +373,13 @@ public class MainActivity extends Activity {
             int strokeWidth = savedInstanceState.getInt("strokeWidth");
             int strokeColor = savedInstanceState.getInt("strokeColor");
             int strokeStyle = savedInstanceState.getInt("strokeStyle");
+            String shape = savedInstanceState.getString("shape");
 
             drawView.setStrokeColor(strokeColor);
             drawView.setStrokeWidth(strokeWidth);
             drawView.setStyle(strokeStyle);
+            drawView.setShape(shape);
+
             Bitmap bmp = savedInstanceState.getParcelable("bitmap");
             // ustaw zapisaną bitmapę w obiekcie drawView
             drawView.setmBitmap(bmp);

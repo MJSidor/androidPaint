@@ -157,18 +157,6 @@ public class DrawView extends View {
     }
 
     /**
-     * Metoda pomocnicza resetująca współrzędne ścieżki do rysownia
-     * oraz rysująca w miejscu dotknięcia okrąg (końce linii)
-     *
-     * @param x
-     * @param y
-     */
-    private void resetPathAndDrawCircle(float x, float y) {
-        mPath.reset();
-        mCanvas.drawCircle(x, y, 10, mPaint);
-    }
-
-    /**
      * Metoda służąca do rysowania linii podczas przesuwania palca po ekranie
      *
      * @param x
