@@ -11,7 +11,9 @@ import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -30,9 +32,13 @@ import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
+import java.io.File;
 import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.xml.datatype.Duration;
 
@@ -84,6 +90,8 @@ public class MainActivity extends Activity {
         Button buttonStrokeWidth = new Button(this);
         Button buttonTool = new Button(this);
         Button buttonOpenFile = new Button(this);
+        Button buttonSaveImageToFile = new Button(this);
+        Button buttonShape = new Button(this);
 
         // ustawienie parametrów przycisków
         buttonStrokeColor.setLayoutParams(param);
@@ -91,6 +99,8 @@ public class MainActivity extends Activity {
         buttonStrokeWidth.setLayoutParams(param);
         buttonTool.setLayoutParams(param);
         buttonOpenFile.setLayoutParams(param);
+        buttonSaveImageToFile.setLayoutParams(param);
+        buttonShape.setLayoutParams(param);
 
         // ustawienie kolorów/tesktu przycisków
         buttonStrokeColor.setText("C");
@@ -98,6 +108,8 @@ public class MainActivity extends Activity {
         buttonStrokeWidth.setText("W");
         buttonTool.setText("T");
         buttonOpenFile.setText("O");
+        buttonSaveImageToFile.setText("S");
+        buttonShape.setText("Sh");
 
 
         // ustawienie listenerów na przyciskach
@@ -139,6 +151,38 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
 
                 performFileSearch();
+                Toast.makeText(MainActivity.this, "Choose an image to edit", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        buttonSaveImageToFile.setOnClickListener(new View.OnClickListener() {
+
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onClick(View v) {
+
+                saveTempBitmap(drawView.getmBitmap());
+                Toast.makeText(MainActivity.this, "Saving image to file...", Toast.LENGTH_SHORT).show();
+
+                /*
+                try {
+                    saveImageToFile(drawView.getmBitmap());
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                */
+            }
+        });
+
+        buttonShape.setOnClickListener(new View.OnClickListener() {
+
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onClick(View v) {
+
+                showShapePicker();
+
             }
         });
 
@@ -148,6 +192,8 @@ public class MainActivity extends Activity {
         lLayout.addView(buttonStrokeWidth);
         lLayout.addView(buttonTool);
         lLayout.addView(buttonOpenFile);
+        lLayout.addView(buttonSaveImageToFile);
+        lLayout.addView(buttonShape);
 
         // zagnieżdżenie (dodanie) layoutu z przyciskami w layoucie głównym
         cLayout.addView(lLayout);
@@ -248,6 +294,21 @@ public class MainActivity extends Activity {
         dialog.show();
     }
 
+    public void showShapePicker() {
+        final String[] tools = {"Line", "Circle", "Rectangle"};
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setTitle("Select a shape")
+                .setItems(tools, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        drawView.setShape(tools[which]);
+                    }
+                });
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
     /**
      * Metoda wywoływana przy obrocie urządzenia
      *
@@ -293,7 +354,6 @@ public class MainActivity extends Activity {
             // ustaw zmienną logiczną drawView dotyczącą przywracania bitmapy po obrocie
             drawView.restored = true;
         }
-
 
 
         super.onRestoreInstanceState(savedInstanceState);
@@ -352,6 +412,80 @@ public class MainActivity extends Activity {
         parcelFileDescriptor.close();
 
         return image;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public void saveImageToFile(Bitmap bmp) throws IOException {
+
+        File file = new File(getGalleryPath(), "image.png");
+        if (!file.exists()) {
+            file.createNewFile();
+        }
+
+        try (FileOutputStream out = new FileOutputStream(file)) {
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, out);
+
+            // out.write(bmp);
+            out.flush();
+            out.close();
+
+            Toast.makeText(MainActivity.this, "Image saved successfully", Toast.LENGTH_SHORT).show();
+
+            // MediaStore.Images.Media.insertImage(getContentResolver(),file.getAbsolutePath(),file.getName(),file.getName());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+
+    public String getGalleryPath() {
+        File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
+
+        if (!folder.exists()) {
+            folder.mkdir();
+        }
+
+        return folder.getAbsolutePath();
+    }
+
+    public void saveTempBitmap(Bitmap bitmap) {
+        if (isExternalStorageWritable()) {
+            saveImage(bitmap);
+        }else{
+            //prompt the user or do something
+        }
+    }
+
+    private void saveImage(Bitmap finalBitmap) {
+
+        String root = Environment.getExternalStorageDirectory().toString();
+        File myDir = new File(root + "/saved_images");
+        myDir.mkdirs();
+
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String fname = "Shutta_"+ timeStamp +".jpg";
+
+        File file = new File(myDir, fname);
+        if (file.exists()) file.delete ();
+        try {
+            FileOutputStream out = new FileOutputStream(file);
+            finalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /* Checks if external storage is available for read and write */
+    public boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
     }
 
 

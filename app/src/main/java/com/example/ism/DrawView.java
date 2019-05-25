@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -26,6 +27,8 @@ public class DrawView extends View {
     private int strokeWidth;
     private int strokeColor;
     private Paint.Style strokeStyle;
+    private String shape;
+    private Rect rectangle = null;
 
     protected boolean restored = false; // zmienna pomocnicza służąca do określania,
     // czy urządzenie zostało właśnie obrócone
@@ -67,6 +70,8 @@ public class DrawView extends View {
         strokeColor = Color.BLUE;
         strokeStyle = Paint.Style.STROKE;
 
+        shape = "Line";
+
         mPaint = new Paint();
         mPaint.setColor(strokeColor);
         mPaint.setStrokeWidth(strokeWidth);
@@ -74,8 +79,7 @@ public class DrawView extends View {
         mPaint.setStyle(strokeStyle);
     }
 
-    public void loadBitmapFromFile(Bitmap bmp)
-    {
+    public void loadBitmapFromFile(Bitmap bmp) {
         // w innym wypadku ustaw bitmapę na podstawie przeskalowanej do nowego wymiaru bitmapy pomocniczej
         Bitmap bitmap = getResizedBitmap(bmp, getWidth(), getHeight());
         mBitmap = bitmap;
@@ -186,16 +190,33 @@ public class DrawView extends View {
             // początek dotknięcia
             case MotionEvent.ACTION_DOWN:
                 mPath.reset();
-                mPath.moveTo(event.getX(), event.getY()); //ustal współrzędne początkowe ściężki na miejsce dotknięcia
+                if (this.shape == "Line")
+                    mPath.moveTo(event.getX(), event.getY()); //ustal współrzędne początkowe ściężki na miejsce dotknięcia
+                if (this.shape == "Rectangle") {
+                    this.rectangle= new Rect();
+                    this.rectangle.top = (int) event.getY();
+                    this.rectangle.left = (int) event.getX();
+                }
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
                 // rysuj linię po ścieżce ruchu palca
-                drawLine(event.getX(), event.getY());
+                if (this.shape == "Line") drawLine(event.getX(), event.getY());
+                if (this.shape == "Rectangle") {
+                    this.rectangle.bottom = (int) event.getY();
+                    this.rectangle.right = (int) event.getX();
+                    mCanvas.drawRect(this.rectangle,mPaint);
+                }
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
                 // po oderwaniu palca od ekranu - zresetuj współrzędne ścieżki oraz narysuj okrąg
+                if (this.shape == "Rectangle") {
+                    this.rectangle.bottom = (int) event.getY();
+                    this.rectangle.right = (int) event.getX();
+                    mCanvas.drawRect(this.rectangle,mPaint);
+                }
+                if (this.shape == "Circle") ;
                 mPath.reset();
                 invalidate();
                 break;
@@ -238,16 +259,24 @@ public class DrawView extends View {
     public void setStyle(int style) {
         switch (style) {
             case 0:
-                this.strokeStyle=Paint.Style.STROKE;
+                this.strokeStyle = Paint.Style.STROKE;
                 break;
             case 1:
-                this.strokeStyle=Paint.Style.FILL;
+                this.strokeStyle = Paint.Style.FILL;
                 break;
             case 2:
-                this.strokeStyle=Paint.Style.FILL_AND_STROKE;
+                this.strokeStyle = Paint.Style.FILL_AND_STROKE;
                 break;
         }
         mPaint.setStyle(this.strokeStyle);
+    }
+
+    public String getShape() {
+        return shape;
+    }
+
+    public void setShape(String shape) {
+        this.shape = shape;
     }
 
     /**
