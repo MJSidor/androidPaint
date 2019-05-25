@@ -295,7 +295,7 @@ public class MainActivity extends Activity {
     }
 
     public void showShapePicker() {
-        final String[] tools = {"Line", "Circle", "Rectangle"};
+        final String[] tools = {"Line", "Rectangle", "Oval"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Select a shape")

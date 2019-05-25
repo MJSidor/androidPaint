@@ -8,6 +8,8 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
+import android.graphics.RectF;
+import android.graphics.drawable.shapes.OvalShape;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -29,6 +31,7 @@ public class DrawView extends View {
     private Paint.Style strokeStyle;
     private String shape;
     private Rect rectangle = null;
+    private RectF oval = null;
 
     protected boolean restored = false; // zmienna pomocnicza służąca do określania,
     // czy urządzenie zostało właśnie obrócone
@@ -197,6 +200,13 @@ public class DrawView extends View {
                     this.rectangle.top = (int) event.getY();
                     this.rectangle.left = (int) event.getX();
                 }
+
+                if (this.shape == "Oval") {
+                    this.oval = new RectF();
+                    this.oval.top = (int) event.getY();
+                    this.oval.left = (int) event.getX();
+                   // mCanvas.drawOv
+                }
                 invalidate();
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -205,8 +215,14 @@ public class DrawView extends View {
                 if (this.shape == "Rectangle") {
                     this.rectangle.bottom = (int) event.getY();
                     this.rectangle.right = (int) event.getX();
-                    mCanvas.drawRect(this.rectangle,mPaint);
+                    // mCanvas.drawRect(this.rectangle,mPaint);
                 }
+                if (this.shape == "Oval") {
+                    this.oval.bottom = (int) event.getY();
+                    this.oval.right = (int) event.getX();
+                    // mCanvas.drawOval(this.oval,mPaint);
+                }
+
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
@@ -215,8 +231,15 @@ public class DrawView extends View {
                     this.rectangle.bottom = (int) event.getY();
                     this.rectangle.right = (int) event.getX();
                     mCanvas.drawRect(this.rectangle,mPaint);
+
+                    this.rectangle=null;
                 }
-                if (this.shape == "Circle") ;
+                if (this.shape == "Oval") {
+                    this.oval.bottom = (int) event.getY();
+                    this.oval.right = (int) event.getX();
+                    mCanvas.drawOval(this.oval,mPaint);
+                    this.oval=null;
+                }
                 mPath.reset();
                 invalidate();
                 break;
