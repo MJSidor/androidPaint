@@ -179,6 +179,30 @@ public class DrawView extends View {
         mCanvas.drawPath(mPath, mPaint);
     }
 
+    private void createRectangle(float x, float y)
+    {
+        this.rectangle.top = (int) y;
+        this.rectangle.left = (int) x;
+    }
+
+    private void updateRectangle(float x, float y)
+    {
+        this.rectangle.bottom = (int) y;
+        this.rectangle.right = (int) x;
+    }
+
+    private void createOval(float x, float y)
+    {
+        this.oval.top = (int) y;
+        this.oval.left = (int) x;
+    }
+
+    private void updateOval(float x, float y)
+    {
+        this.oval.bottom = (int) y;
+        this.oval.right = (int) x;
+    }
+
     /**
      * Metoda wywoływana podczas dotknięcia ekranu
      *
@@ -197,14 +221,12 @@ public class DrawView extends View {
                     mPath.moveTo(event.getX(), event.getY()); //ustal współrzędne początkowe ściężki na miejsce dotknięcia
                 if (this.shape == "Rectangle") {
                     this.rectangle= new Rect();
-                    this.rectangle.top = (int) event.getY();
-                    this.rectangle.left = (int) event.getX();
+                    createRectangle(event.getX(),event.getY());
                 }
 
                 if (this.shape == "Oval") {
                     this.oval = new RectF();
-                    this.oval.top = (int) event.getY();
-                    this.oval.left = (int) event.getX();
+                    createOval(event.getX(),event.getY());
                    // mCanvas.drawOv
                 }
                 invalidate();
@@ -212,31 +234,21 @@ public class DrawView extends View {
             case MotionEvent.ACTION_MOVE:
                 // rysuj linię po ścieżce ruchu palca
                 if (this.shape == "Line") drawLine(event.getX(), event.getY());
-                if (this.shape == "Rectangle") {
-                    this.rectangle.bottom = (int) event.getY();
-                    this.rectangle.right = (int) event.getX();
-                    // mCanvas.drawRect(this.rectangle,mPaint);
-                }
-                if (this.shape == "Oval") {
-                    this.oval.bottom = (int) event.getY();
-                    this.oval.right = (int) event.getX();
-                    // mCanvas.drawOval(this.oval,mPaint);
-                }
+                if (this.shape == "Rectangle") updateRectangle(event.getX(), event.getY());
+                if (this.shape == "Oval") updateOval(event.getX(), event.getY());
 
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
                 // po oderwaniu palca od ekranu - zresetuj współrzędne ścieżki oraz narysuj okrąg
                 if (this.shape == "Rectangle") {
-                    this.rectangle.bottom = (int) event.getY();
-                    this.rectangle.right = (int) event.getX();
+                    updateRectangle(event.getX(), event.getY());
                     mCanvas.drawRect(this.rectangle,mPaint);
 
                     this.rectangle=null;
                 }
                 if (this.shape == "Oval") {
-                    this.oval.bottom = (int) event.getY();
-                    this.oval.right = (int) event.getX();
+                    updateOval(event.getX(), event.getY());
                     mCanvas.drawOval(this.oval,mPaint);
                     this.oval=null;
                 }
