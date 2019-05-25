@@ -51,6 +51,7 @@ public class MainActivity extends Activity {
     Bitmap bmp;
     int brushWidth;
     boolean fileOpen = false;
+    boolean camera = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,6 +93,7 @@ public class MainActivity extends Activity {
         Button buttonOpenFile = new Button(this);
         Button buttonSaveImageToFile = new Button(this);
         Button buttonShape = new Button(this);
+        Button buttonCamera = new Button(this);
 
         // ustawienie parametrów przycisków
         buttonStrokeColor.setLayoutParams(param);
@@ -101,6 +103,7 @@ public class MainActivity extends Activity {
         buttonOpenFile.setLayoutParams(param);
         buttonSaveImageToFile.setLayoutParams(param);
         buttonShape.setLayoutParams(param);
+        buttonCamera.setLayoutParams(param);
 
         // ustawienie kolorów/tesktu przycisków
         buttonStrokeColor.setText("C");
@@ -110,6 +113,7 @@ public class MainActivity extends Activity {
         buttonOpenFile.setText("O");
         buttonSaveImageToFile.setText("S");
         buttonShape.setText("Sh");
+        buttonCamera.setText("Cam");
 
 
         // ustawienie listenerów na przyciskach
@@ -186,6 +190,17 @@ public class MainActivity extends Activity {
             }
         });
 
+        buttonCamera.setOnClickListener(new View.OnClickListener() {
+
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onClick(View v) {
+
+                dispatchTakePictureIntent();
+
+            }
+        });
+
         // dodanie przycisków do layoutu
         lLayout.addView(buttonStrokeColor);
         lLayout.addView(buttonClearScreen);
@@ -194,6 +209,7 @@ public class MainActivity extends Activity {
         lLayout.addView(buttonOpenFile);
         lLayout.addView(buttonSaveImageToFile);
         lLayout.addView(buttonShape);
+        lLayout.addView(buttonCamera);
 
         // zagnieżdżenie (dodanie) layoutu z przyciskami w layoucie głównym
         cLayout.addView(lLayout);
@@ -309,6 +325,17 @@ public class MainActivity extends Activity {
         dialog.show();
     }
 
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+        this.camera=true;
+    }
+
+
     /**
      * Metoda wywoływana przy obrocie urządzenia
      *
@@ -317,11 +344,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
 
-        outState.putInt("strokeWidth", drawView.getStrokeWidth());
-        outState.putInt("strokeColor", drawView.getStrokeColor());
-        outState.putInt("strokeStyle", drawView.getStyle());
+        if (!camera) {
+            outState.putInt("strokeWidth", drawView.getStrokeWidth());
+            outState.putInt("strokeColor", drawView.getStrokeColor());
+            outState.putInt("strokeStyle", drawView.getStyle());
+        }
 
-        if (!fileOpen) {
+        if (!fileOpen && !camera) {
 
             // zapisz obecną bitmapę
             outState.putParcelable("bitmap", drawView.getmBitmap());
@@ -338,7 +367,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
 
-        if (!fileOpen) {
+        if (!fileOpen && !camera) {
 
             int strokeWidth = savedInstanceState.getInt("strokeWidth");
             int strokeColor = savedInstanceState.getInt("strokeColor");
@@ -401,6 +430,14 @@ public class MainActivity extends Activity {
 
             }
         }
+
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = resultData.getExtras();
+            Bitmap photoBitmap = (Bitmap) extras.get("data");
+            drawView.loadBitmapFromFile(photoBitmap);
+            this.camera=false;
+        }
+
     }
 
     private Bitmap getBitmapFromUri(Uri uri) throws IOException {
@@ -453,7 +490,7 @@ public class MainActivity extends Activity {
     public void saveTempBitmap(Bitmap bitmap) {
         if (isExternalStorageWritable()) {
             saveImage(bitmap);
-        }else{
+        } else {
             //prompt the user or do something
         }
     }
@@ -465,10 +502,10 @@ public class MainActivity extends Activity {
         myDir.mkdirs();
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String fname = "Shutta_"+ timeStamp +".jpg";
+        String fname = "Shutta_" + timeStamp + ".jpg";
 
         File file = new File(myDir, fname);
-        if (file.exists()) file.delete ();
+        if (file.exists()) file.delete();
         try {
             FileOutputStream out = new FileOutputStream(file);
             finalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
