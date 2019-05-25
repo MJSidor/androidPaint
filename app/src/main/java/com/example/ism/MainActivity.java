@@ -377,9 +377,8 @@ public class MainActivity extends Activity {
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
         }
-        this.camera=true;
+        this.camera = true;
     }
-
 
 
     /**
@@ -482,27 +481,33 @@ public class MainActivity extends Activity {
         }
 
         if (requestCode == REQUEST_TAKE_PHOTO && resultCode == RESULT_OK) {
-            /*
-            Bundle extras = resultData.getExtras();
-            Bitmap photoBitmap = (Bitmap) extras.get("data");
-            drawView.loadBitmapFromFile(photoBitmap);
-            */
 
-                try {
-                    drawView.loadBitmapFromFile(getBitmapFromUri(this.photoUri));
-                    this.fileOpen = false;
+            try {
+                drawView.loadBitmapFromFile(getBitmapFromUri(this.photoUri));
+                this.fileOpen = false;
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } finally {
-                    this.photoUri=null;
-                    this.camera=false;
-                }
-
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                deleteFile(this.photoUri);
+                this.photoUri = null;
+                this.camera = false;
+            }
 
 
         }
 
+    }
+
+    public void deleteFile(Uri uri) {
+        File file = new File(uri.getPath());
+        if (file.exists()) {
+            if (file.delete()) {
+                System.out.println("file Deleted :" + uri.getPath());
+            } else {
+                System.out.println("file not Deleted :" + uri.getPath());
+            }
+        }
     }
 
     private Bitmap getBitmapFromUri(Uri uri) throws IOException {
