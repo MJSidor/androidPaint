@@ -168,17 +168,9 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View v) {
 
-                saveTempBitmap(drawView.getmBitmap());
+                saveImage();
                 Toast.makeText(MainActivity.this, "Saving image to file...", Toast.LENGTH_SHORT).show();
 
-                /*
-                try {
-                    saveImageToFile(drawView.getmBitmap());
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                */
             }
         });
 
@@ -330,18 +322,9 @@ public class MainActivity extends Activity {
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
 
-    /*
-    private void dispatchTakePictureIntent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-        }
-        this.camera=true;
-    }
-    */
     private String currentPhotoPath;
 
-    private File createImageFile() throws IOException {
+    private File createTempImageFile() throws IOException {
 
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "mPAINT_" + timeStamp + "_";
@@ -356,6 +339,23 @@ public class MainActivity extends Activity {
         return image;
     }
 
+    public void saveImage() {
+        File photoFile = null;
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "mPAINT_" + timeStamp + ".jpg";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        photoFile = new File(storageDir,imageFileName);
+
+        try {
+            FileOutputStream out = new FileOutputStream(photoFile);
+            drawView.getmBitmap().compress(Bitmap.CompressFormat.JPEG, 100, out);
+            out.flush();
+            out.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     static final int REQUEST_TAKE_PHOTO = 1;
 
     private void dispatchTakePictureIntent() {
@@ -365,7 +365,7 @@ public class MainActivity extends Activity {
 
             File photoFile = null;
             try {
-                photoFile = createImageFile();
+                photoFile = createTempImageFile();
             } catch (IOException ex) {
             }
             if (photoFile != null) {
@@ -521,6 +521,7 @@ public class MainActivity extends Activity {
         return image;
     }
 
+    /*
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void saveImageToFile(Bitmap bmp) throws IOException {
 
@@ -565,6 +566,7 @@ public class MainActivity extends Activity {
         }
     }
 
+
     private void saveImage(Bitmap finalBitmap) {
 
         String root = Environment.getExternalStorageDirectory().toString();
@@ -585,6 +587,7 @@ public class MainActivity extends Activity {
             e.printStackTrace();
         }
     }
+    */
 
     /* Checks if external storage is available for read and write */
     public boolean isExternalStorageWritable() {
