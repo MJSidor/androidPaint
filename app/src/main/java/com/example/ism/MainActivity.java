@@ -169,7 +169,6 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
 
                 saveImage();
-                Toast.makeText(MainActivity.this, "Saving image to file...", Toast.LENGTH_SHORT).show();
 
             }
         });
@@ -351,6 +350,7 @@ public class MainActivity extends Activity {
             drawView.getmBitmap().compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.flush();
             out.close();
+            Toast.makeText(MainActivity.this, "Saving image to file...", Toast.LENGTH_SHORT).show();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -519,83 +519,6 @@ public class MainActivity extends Activity {
         parcelFileDescriptor.close();
 
         return image;
-    }
-
-    /*
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    public void saveImageToFile(Bitmap bmp) throws IOException {
-
-        File file = new File(getGalleryPath(), "image.png");
-        if (!file.exists()) {
-            file.createNewFile();
-        }
-
-        try (FileOutputStream out = new FileOutputStream(file)) {
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, out);
-
-            // out.write(bmp);
-            out.flush();
-            out.close();
-
-            Toast.makeText(MainActivity.this, "Image saved successfully", Toast.LENGTH_SHORT).show();
-
-            // MediaStore.Images.Media.insertImage(getContentResolver(),file.getAbsolutePath(),file.getName(),file.getName());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-
-
-    public String getGalleryPath() {
-        File folder = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM);
-
-        if (!folder.exists()) {
-            folder.mkdir();
-        }
-
-        return folder.getAbsolutePath();
-    }
-
-    public void saveTempBitmap(Bitmap bitmap) {
-        if (isExternalStorageWritable()) {
-            saveImage(bitmap);
-        } else {
-            //prompt the user or do something
-        }
-    }
-
-
-    private void saveImage(Bitmap finalBitmap) {
-
-        String root = Environment.getExternalStorageDirectory().toString();
-        File myDir = new File(root + "/saved_images");
-        myDir.mkdirs();
-
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String fname = "Shutta_" + timeStamp + ".jpg";
-
-        File file = new File(myDir, fname);
-        if (file.exists()) file.delete();
-        try {
-            FileOutputStream out = new FileOutputStream(file);
-            finalBitmap.compress(Bitmap.CompressFormat.JPEG, 100, out);
-            out.flush();
-            out.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    */
-
-    /* Checks if external storage is available for read and write */
-    public boolean isExternalStorageWritable() {
-        String state = Environment.getExternalStorageState();
-        if (Environment.MEDIA_MOUNTED.equals(state)) {
-            return true;
-        }
-        return false;
     }
 
 
