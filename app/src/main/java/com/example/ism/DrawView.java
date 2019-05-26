@@ -112,10 +112,13 @@ public class DrawView extends View {
             // w innym wypadku ustaw bitmapę na podstawie przeskalowanej do nowego wymiaru bitmapy pomocniczej
             Bitmap bmp = getResizedBitmap(mBitmap, w, h);
             mBitmap = bmp;
-            restored = false;
+
         }
         // utwórz kanwę na podstawie bitmapy
         mCanvas = new Canvas(mBitmap);
+        if (!restored) mCanvas.drawColor(Color.WHITE);
+        restored = false;
+
     }
 
     /**

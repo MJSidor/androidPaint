@@ -54,6 +54,7 @@ public class MainActivity extends Activity {
     int brushWidth;
     boolean fileOpen = false;
     boolean camera = false;
+    boolean saving = false;
     Uri photoUri = null;
 
     @Override
@@ -339,6 +340,8 @@ public class MainActivity extends Activity {
     }
 
     public void saveImage() {
+
+        this.saving=true;
         File photoFile = null;
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "mPAINT_" + timeStamp + ".jpg";
@@ -347,10 +350,13 @@ public class MainActivity extends Activity {
 
         try {
             FileOutputStream out = new FileOutputStream(photoFile);
-            drawView.getmBitmap().compress(Bitmap.CompressFormat.JPEG, 100, out);
+            Bitmap bmp = drawView.getmBitmap();
+            bmp.setHasAlpha(true);
+            bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.flush();
             out.close();
             Toast.makeText(MainActivity.this, "Saving image to file...", Toast.LENGTH_SHORT).show();
+            this.saving=false;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -389,14 +395,14 @@ public class MainActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
 
-        if (!camera) {
+        if (!camera && !saving) {
             outState.putInt("strokeWidth", drawView.getStrokeWidth());
             outState.putInt("strokeColor", drawView.getStrokeColor());
             outState.putInt("strokeStyle", drawView.getStyle());
             outState.putString("shape", drawView.getShape());
         }
 
-        if (!fileOpen && !camera) {
+        if (!fileOpen && !camera &&!saving) {
 
             // zapisz obecną bitmapę
             outState.putParcelable("bitmap", drawView.getmBitmap());
