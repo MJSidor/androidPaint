@@ -2,6 +2,7 @@ package com.example.ism;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -35,6 +36,7 @@ import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
 
 import java.io.File;
 import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -341,12 +343,12 @@ public class MainActivity extends Activity {
 
     public void saveImage() {
 
-        this.saving=true;
+        this.saving = true;
         File photoFile = null;
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "mPAINT_" + timeStamp + ".jpg";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        photoFile = new File(storageDir,imageFileName);
+        photoFile = new File(storageDir, imageFileName);
 
         try {
             FileOutputStream out = new FileOutputStream(photoFile);
@@ -356,9 +358,11 @@ public class MainActivity extends Activity {
             out.flush();
             out.close();
             Toast.makeText(MainActivity.this, "Saving image to file...", Toast.LENGTH_SHORT).show();
-            this.saving=false;
+
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            this.saving = false;
         }
     }
 
@@ -379,7 +383,9 @@ public class MainActivity extends Activity {
                         "com.example.android.fileprovider",
                         photoFile);
 
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoUri);
+
+
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, this.photoUri);
                 startActivityForResult(takePictureIntent, REQUEST_TAKE_PHOTO);
             }
         }
@@ -395,14 +401,14 @@ public class MainActivity extends Activity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
 
-        if (!camera && !saving) {
+        if (!camera && !saving && !fileOpen) {
             outState.putInt("strokeWidth", drawView.getStrokeWidth());
             outState.putInt("strokeColor", drawView.getStrokeColor());
             outState.putInt("strokeStyle", drawView.getStyle());
             outState.putString("shape", drawView.getShape());
         }
 
-        if (!fileOpen && !camera &&!saving) {
+        if (!fileOpen && !camera && !saving) {
 
             // zapisz obecną bitmapę
             outState.putParcelable("bitmap", drawView.getmBitmap());
@@ -419,7 +425,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
 
-        if (!fileOpen && !camera) {
+        if (!fileOpen && !camera && !saving) {
 
             int strokeWidth = savedInstanceState.getInt("strokeWidth");
             int strokeColor = savedInstanceState.getInt("strokeColor");
@@ -506,7 +512,24 @@ public class MainActivity extends Activity {
     }
 
     public void deleteFile(Uri uri) {
+
+        final ContentResolver contentResolver = this.getApplicationContext().getContentResolver();
+
+
         File file = new File(uri.getPath());
+        Uri u = uri;
+        String path = uri.getPath();
+
+        final String pathone = MediaStore.MediaColumns.DATA + "=?";
+        final String[] selectedArgs = new String[] {
+                file.getAbsolutePath()
+        };
+
+        contentResolver.delete(uri,pathone,selectedArgs);
+        /*
+        boolean exists = file.getAbsoluteFile().exists();
+        boolean deleted = file.getAbsoluteFile().delete();
+
         if (file.exists()) {
             if (file.delete()) {
                 System.out.println("file Deleted :" + uri.getPath());
@@ -514,6 +537,7 @@ public class MainActivity extends Activity {
                 System.out.println("file not Deleted :" + uri.getPath());
             }
         }
+        */
     }
 
     private Bitmap getBitmapFromUri(Uri uri) throws IOException {
