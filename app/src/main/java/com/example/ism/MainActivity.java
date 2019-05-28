@@ -1,8 +1,11 @@
 package com.example.ism;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -10,6 +13,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -17,6 +21,7 @@ import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Layout;
@@ -62,6 +67,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
 
         setContentView(R.layout.activity_main);
         cLayout = findViewById(R.id.cLayout);
@@ -347,8 +355,15 @@ public class MainActivity extends Activity {
         File photoFile = null;
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
         String imageFileName = "mPAINT_" + timeStamp + ".jpg";
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        photoFile = new File(storageDir, imageFileName);
+        // File storageDir = getExternalFilesDir("mPaint");
+
+        File dir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "mPaint");
+        if (!dir.mkdirs()) {
+            Log.e(imageFileName, "Directory not created");
+        }
+
+        photoFile = new File(dir, imageFileName);
 
         try {
             FileOutputStream out = new FileOutputStream(photoFile);
@@ -357,11 +372,13 @@ public class MainActivity extends Activity {
             bmp.compress(Bitmap.CompressFormat.JPEG, 100, out);
             out.flush();
             out.close();
+            addImageToGallery(photoFile.getAbsolutePath(), this);
             Toast.makeText(MainActivity.this, "Saving image to file...", Toast.LENGTH_SHORT).show();
 
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+
             this.saving = false;
         }
     }
@@ -382,7 +399,6 @@ public class MainActivity extends Activity {
                 this.photoUri = FileProvider.getUriForFile(this,
                         "com.example.android.fileprovider",
                         photoFile);
-
 
 
                 takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, this.photoUri);
@@ -515,30 +531,27 @@ public class MainActivity extends Activity {
 
         final ContentResolver contentResolver = this.getApplicationContext().getContentResolver();
 
-
         File file = new File(uri.getPath());
-        Uri u = uri;
-        String path = uri.getPath();
 
         final String pathone = MediaStore.MediaColumns.DATA + "=?";
-        final String[] selectedArgs = new String[] {
+        final String[] selectedArgs = new String[]{
                 file.getAbsolutePath()
         };
 
-        contentResolver.delete(uri,pathone,selectedArgs);
-        /*
-        boolean exists = file.getAbsoluteFile().exists();
-        boolean deleted = file.getAbsoluteFile().delete();
-
-        if (file.exists()) {
-            if (file.delete()) {
-                System.out.println("file Deleted :" + uri.getPath());
-            } else {
-                System.out.println("file not Deleted :" + uri.getPath());
-            }
-        }
-        */
+        contentResolver.delete(uri, pathone, selectedArgs);
     }
+
+    public static void addImageToGallery(final String filePath, final Context context) {
+
+        ContentValues values = new ContentValues();
+
+        values.put(MediaStore.Images.Media.DATE_TAKEN, System.currentTimeMillis());
+        values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg");
+        values.put(MediaStore.MediaColumns.DATA, filePath);
+
+        context.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
+    }
+
 
     private Bitmap getBitmapFromUri(Uri uri) throws IOException {
 
