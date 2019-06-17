@@ -29,6 +29,7 @@ import android.util.Log;
 import android.util.Size;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -107,7 +108,8 @@ public class MainActivity extends Activity {
         Button buttonOpenFile = new Button(this);
         Button buttonSaveImageToFile = new Button(this);
         Button buttonShape = new Button(this);
-        Button buttonCamera = new Button(this);
+        ImageButton buttonCamera = new ImageButton(this);
+        buttonCamera.setImageResource(R.drawable.ic_camera);
 
         // ustawienie parametrów przycisków
         buttonStrokeColor.setLayoutParams(param);
@@ -127,7 +129,6 @@ public class MainActivity extends Activity {
         buttonOpenFile.setText("O");
         buttonSaveImageToFile.setText("S");
         buttonShape.setText("Sh");
-        buttonCamera.setText("Cam");
 
 
         // ustawienie listenerów na przyciskach
@@ -207,6 +208,7 @@ public class MainActivity extends Activity {
         });
 
         // dodanie przycisków do layoutu
+        /*
         lLayout.addView(buttonStrokeColor);
         lLayout.addView(buttonClearScreen);
         lLayout.addView(buttonStrokeWidth);
@@ -214,6 +216,7 @@ public class MainActivity extends Activity {
         lLayout.addView(buttonOpenFile);
         lLayout.addView(buttonSaveImageToFile);
         lLayout.addView(buttonShape);
+        */
         lLayout.addView(buttonCamera);
 
         // zagnieżdżenie (dodanie) layoutu z przyciskami w layoucie głównym
@@ -301,14 +304,15 @@ public class MainActivity extends Activity {
     }
 
     public void showToolPicker() {
-        String[] tools = {"Brush", "Filler", "Stroke and fill"};
+        String[] tools = {"Brush", "Filler", "Stroke and fill", "Eraser"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Select a tool")
                 .setItems(tools, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 
-                        drawView.setStyle(which);
+                        if (which !=3) drawView.setStyle(which);
+                        if (which == 3) drawView.enableEraser();
                     }
                 });
         AlertDialog dialog = builder.create();
