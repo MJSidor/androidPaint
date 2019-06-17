@@ -210,12 +210,13 @@ public class MainActivity extends Activity {
         // dodanie przycisków do layoutu
         lLayout.addView(buttonTool);
         lLayout.addView(buttonShape);
-        lLayout.addView(buttonClearScreen);
+        lLayout.addView(buttonStrokeWidth);
         lLayout.addView(buttonStrokeColor);
         lLayout.addView(buttonOpenFile);
-        lLayout.addView(buttonSaveImageToFile);
         lLayout.addView(buttonCamera);
-        lLayout.addView(buttonStrokeWidth);
+        lLayout.addView(buttonSaveImageToFile);
+
+        lLayout.addView(buttonClearScreen);
 
         // zagnieżdżenie (dodanie) layoutu z przyciskami w layoucie głównym
         cLayout.addView(lLayout);
