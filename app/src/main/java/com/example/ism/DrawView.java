@@ -96,10 +96,10 @@ public class DrawView extends View {
 
     public void initEraserPaint() {
         eraserPaint = new Paint(Paint.DITHER_FLAG);
-        //eraserPaint.setColor(Color.TRANSPARENT);
+        eraserPaint.setColor(Color.TRANSPARENT);
         eraserPaint.setStrokeWidth(strokeWidth);
-        eraserPaint.setColor(Color.BLACK);
-        //eraserPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+        //eraserPaint.setColor(Color.BLACK);
+        eraserPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
     }
 
 

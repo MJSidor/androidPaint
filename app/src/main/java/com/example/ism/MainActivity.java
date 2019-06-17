@@ -70,7 +70,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         ActivityCompat.requestPermissions(this,
-                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},1);
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
 
         setContentView(R.layout.activity_main);
         cLayout = findViewById(R.id.cLayout);
@@ -101,15 +101,24 @@ public class MainActivity extends Activity {
         );
 
         // tworzenie przycisków
-        Button buttonStrokeColor = new Button(this);
-        Button buttonClearScreen = new Button(this);
-        Button buttonStrokeWidth = new Button(this);
-        Button buttonTool = new Button(this);
-        Button buttonOpenFile = new Button(this);
-        Button buttonSaveImageToFile = new Button(this);
-        Button buttonShape = new Button(this);
+
+        ImageButton buttonTool = new ImageButton(this);
+        ImageButton buttonShape = new ImageButton(this);
+        ImageButton buttonClearScreen = new ImageButton(this);
         ImageButton buttonCamera = new ImageButton(this);
-        buttonCamera.setImageResource(R.drawable.ic_camera);
+        ImageButton buttonOpenFile = new ImageButton(this);
+        ImageButton buttonSaveImageToFile = new ImageButton(this);
+        ImageButton buttonStrokeColor = new ImageButton(this);
+        ImageButton buttonStrokeWidth = new ImageButton(this);
+
+        buttonSaveImageToFile.setImageResource(R.drawable.ic_save_dark);
+        buttonOpenFile.setImageResource(R.drawable.ic_open_dark);
+        buttonCamera.setImageResource(R.drawable.ic_camera_dark);
+        buttonStrokeColor.setImageResource(R.drawable.ic_color_dark);
+        buttonClearScreen.setImageResource(R.drawable.ic_clear_dark);
+        buttonStrokeWidth.setImageResource(R.drawable.ic_width_dark);
+        buttonTool.setImageResource(R.drawable.ic_tool_dark);
+        buttonShape.setImageResource(R.drawable.ic_shape_dark);
 
         // ustawienie parametrów przycisków
         buttonStrokeColor.setLayoutParams(param);
@@ -120,15 +129,6 @@ public class MainActivity extends Activity {
         buttonSaveImageToFile.setLayoutParams(param);
         buttonShape.setLayoutParams(param);
         buttonCamera.setLayoutParams(param);
-
-        // ustawienie kolorów/tesktu przycisków
-        buttonStrokeColor.setText("C");
-        buttonClearScreen.setText("X");
-        buttonStrokeWidth.setText("W");
-        buttonTool.setText("T");
-        buttonOpenFile.setText("O");
-        buttonSaveImageToFile.setText("S");
-        buttonShape.setText("Sh");
 
 
         // ustawienie listenerów na przyciskach
@@ -208,16 +208,14 @@ public class MainActivity extends Activity {
         });
 
         // dodanie przycisków do layoutu
-        /*
-        lLayout.addView(buttonStrokeColor);
-        lLayout.addView(buttonClearScreen);
-        lLayout.addView(buttonStrokeWidth);
         lLayout.addView(buttonTool);
+        lLayout.addView(buttonShape);
+        lLayout.addView(buttonClearScreen);
+        lLayout.addView(buttonStrokeColor);
         lLayout.addView(buttonOpenFile);
         lLayout.addView(buttonSaveImageToFile);
-        lLayout.addView(buttonShape);
-        */
         lLayout.addView(buttonCamera);
+        lLayout.addView(buttonStrokeWidth);
 
         // zagnieżdżenie (dodanie) layoutu z przyciskami w layoucie głównym
         cLayout.addView(lLayout);
@@ -311,7 +309,7 @@ public class MainActivity extends Activity {
                 .setItems(tools, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 
-                        if (which !=3) drawView.setStyle(which);
+                        if (which != 3) drawView.setStyle(which);
                         if (which == 3) drawView.enableEraser();
                     }
                 });
