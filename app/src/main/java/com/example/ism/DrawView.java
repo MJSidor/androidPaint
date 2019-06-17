@@ -276,7 +276,7 @@ public class DrawView extends View {
 
                     //mCanvas.drawOval(tempOval, eraserPaint);
 
-                    mCanvas.drawOval(this.oval, mPaint);
+                    // mCanvas.drawOval(this.oval, mPaint);
 
 
                 }
@@ -301,6 +301,7 @@ public class DrawView extends View {
                         mCanvas.drawOval(this.tempOval, mPaint);
                         mCanvas.drawOval(this.oval, mPaint);
                         */
+                        mCanvas.drawOval(this.oval, mPaint);
                         this.oval = null;
                         this.tempOval=null;
                         break;
