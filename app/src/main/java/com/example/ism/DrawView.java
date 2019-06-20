@@ -294,13 +294,12 @@ public class DrawView extends View {
                         this.rectangle = null;
                         break;
                     case "Oval":
-
                         /*
-                        updateOval(event.getX(), event.getY());
-
                         mCanvas.drawOval(this.tempOval, mPaint);
                         mCanvas.drawOval(this.oval, mPaint);
                         */
+
+                        updateOval(event.getX(), event.getY());
                         mCanvas.drawOval(this.oval, mPaint);
                         this.oval = null;
                         this.tempOval=null;
