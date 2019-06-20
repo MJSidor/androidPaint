@@ -373,6 +373,7 @@ public class DrawView extends View {
 
     public void setShape(String shape) {
         this.shape = shape;
+        if (shape == "Line") this.setStyle(0);
         initPaint();
 
     }
