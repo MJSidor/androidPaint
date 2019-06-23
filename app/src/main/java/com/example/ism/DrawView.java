@@ -98,8 +98,8 @@ public class DrawView extends View {
         eraserPaint = new Paint(Paint.DITHER_FLAG);
         eraserPaint.setColor(Color.TRANSPARENT);
         eraserPaint.setStrokeWidth(strokeWidth);
-        //eraserPaint.setColor(Color.BLACK);
         eraserPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+
     }
 
 
@@ -248,64 +248,72 @@ public class DrawView extends View {
             case MotionEvent.ACTION_DOWN:
                 mPath.reset();
 
-                switch (this.shape) {
-                    case "Line":
-                        mPath.moveTo(event.getX(), event.getY()); //ustal współrzędne początkowe ściężki na miejsce dotknięcia
-                        break;
-                    case "Rectangle":
-                        this.rectangle = new Rect();
-                        createRectangle(event.getX(), event.getY());
-                        break;
-                    case "Oval":
-                        this.oval = new RectF();
-                        this.tempOval = new RectF();
-                        createOval(event.getX(), event.getY());
+                if (! (this.strokeStyle == Paint.Style.FILL)) {
+                    switch (this.shape) {
+                        case "Line":
+                            mPath.moveTo(event.getX(), event.getY()); //ustal współrzędne początkowe ściężki na miejsce dotknięcia
+                            break;
+                        case "Rectangle":
+                            this.rectangle = new Rect();
+                            createRectangle(event.getX(), event.getY());
+                            break;
+                        case "Oval":
+                            this.oval = new RectF();
+                            this.tempOval = new RectF();
+                            createOval(event.getX(), event.getY());
+                    }
                 }
-
                 invalidate();
                 break;
 
             case MotionEvent.ACTION_MOVE:
                 // rysuj linię po ścieżce ruchu palca
-                if (this.shape == "Line") drawLine(event.getX(), event.getY());
-                if (this.shape == "Rectangle") updateRectangle(event.getX(), event.getY());
-                if (this.shape == "Oval") {
+                if (! (this.strokeStyle == Paint.Style.FILL)) {
+                    if (this.shape == "Line") drawLine(event.getX(), event.getY());
+                    if (this.shape == "Rectangle") updateRectangle(event.getX(), event.getY());
+                    if (this.shape == "Oval") {
 
-                    updateOval(event.getX(), event.getY());
-
-
-                    //mCanvas.drawOval(tempOval, eraserPaint);
-
-                    // mCanvas.drawOval(this.oval, mPaint);
+                        updateOval(event.getX(), event.getY());
 
 
+                        //mCanvas.drawOval(tempOval, eraserPaint);
+
+                        // mCanvas.drawOval(this.oval, mPaint);
+
+
+                    }
                 }
 
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                // po oderwaniu palca od ekranu - zresetuj współrzędne ścieżki oraz narysuj okrąg
-                switch (this.shape) {
+                if (! (this.strokeStyle == Paint.Style.FILL)) {
+                    // po oderwaniu palca od ekranu - zresetuj współrzędne ścieżki oraz narysuj okrąg
+                    switch (this.shape) {
 
-                    case "Rectangle":
-                        updateRectangle(event.getX(), event.getY());
-                        mCanvas.drawRect(this.rectangle, mPaint);
+                        case "Rectangle":
+                            updateRectangle(event.getX(), event.getY());
+                            mCanvas.drawRect(this.rectangle, mPaint);
 
-                        this.rectangle = null;
-                        break;
-                    case "Oval":
+                            this.rectangle = null;
+                            break;
+                        case "Oval":
                         /*
                         mCanvas.drawOval(this.tempOval, mPaint);
                         mCanvas.drawOval(this.oval, mPaint);
                         */
 
-                        updateOval(event.getX(), event.getY());
-                        mCanvas.drawOval(this.oval, mPaint);
-                        this.oval = null;
-                        this.tempOval=null;
-                        break;
+                            updateOval(event.getX(), event.getY());
+                            mCanvas.drawOval(this.oval, mPaint);
+                            this.oval = null;
+                            this.tempOval = null;
+                            break;
+                    }
                 }
-
+                else
+                {
+                    this.mCanvas.drawColor(this.strokeColor);
+                }
                 mPath.reset();
                 invalidate();
                 break;
@@ -364,6 +372,7 @@ public class DrawView extends View {
 
     public void enableEraser() {
         this.mPaint = this.eraserPaint;
+        this.strokeStyle = Paint.Style.STROKE;
     }
 
     public String getShape() {
@@ -372,6 +381,7 @@ public class DrawView extends View {
 
     public void setShape(String shape) {
         this.shape = shape;
+        if (this.strokeStyle == Paint.Style.FILL) this.strokeStyle = Paint.Style.STROKE;;
         if (shape == "Line") this.setStyle(0);
         initPaint();
 

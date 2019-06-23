@@ -306,7 +306,7 @@ public class MainActivity extends Activity {
     }
 
     public void showToolPicker() {
-        String[] tools = {"Brush", "Filler", "Stroke and fill", "Eraser"};
+        String[] tools = {"Brush", "Filler", "Fill the drawn shape", "Eraser"};
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
         builder.setTitle("Select a tool")
