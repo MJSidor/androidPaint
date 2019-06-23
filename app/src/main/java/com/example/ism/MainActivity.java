@@ -64,6 +64,8 @@ public class MainActivity extends Activity {
     boolean camera = false;
     boolean saving = false;
     Uri photoUri = null;
+    AlertDialog.Builder builder;
+    AlertDialog dialog = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -228,13 +230,14 @@ public class MainActivity extends Activity {
      */
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void showWidthDialog() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
 
-        builder.setMessage("Current value: " + Integer.toString(drawView.getStrokeWidth()))
+        builder = new AlertDialog.Builder(MainActivity.this);
+
+        builder.setMessage("Current value: " + Integer.toString(drawView.getStrokeWidth()) + "%")
                 .setTitle("Adjust brush width");
 
-        SeekBar widthSeekBar = new SeekBar(this);
-        widthSeekBar.setMax(100);
+        final SeekBar widthSeekBar = new SeekBar(this);
+        widthSeekBar.setMax(101);
         widthSeekBar.setMin(1);
         widthSeekBar.setKeyProgressIncrement(1);
         widthSeekBar.setProgress(drawView.getStrokeWidth());
@@ -244,7 +247,7 @@ public class MainActivity extends Activity {
         widthSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 brushWidth = progress;
-                builder.setMessage("Current value: " + Integer.toString(progress));
+                dialog.setMessage("Current value: " + Integer.toString(progress) + "%");
             }
 
             @Override
@@ -270,7 +273,7 @@ public class MainActivity extends Activity {
             }
         });
 
-        AlertDialog dialog = builder.create();
+        dialog = builder.create();
         dialog.show();
     }
 
