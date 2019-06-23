@@ -234,8 +234,8 @@ public class MainActivity extends Activity {
 
         builder = new AlertDialog.Builder(MainActivity.this);
 
-        builder.setMessage("Current value: " + Integer.toString(drawView.getStrokeWidth()) + "%")
-                .setTitle("Adjust brush width");
+        builder.setMessage(Integer.toString(drawView.getStrokeWidth()) + "%")
+                .setTitle("Width");
 
         final SeekBar widthSeekBar = new SeekBar(this);
         widthSeekBar.setMax(101);
@@ -248,7 +248,7 @@ public class MainActivity extends Activity {
         widthSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 brushWidth = progress;
-                dialog.setMessage("Current value: " + Integer.toString(progress) + "%");
+                dialog.setMessage(Integer.toString(progress) + "%");
             }
 
             @Override
@@ -281,7 +281,7 @@ public class MainActivity extends Activity {
     public void showColorPicker() {
         ColorPickerDialogBuilder
                 .with(MainActivity.this)
-                .setTitle("Choose color")
+                .setTitle("Colors")
                 .initialColor(Color.RED)
                 .wheelType(ColorPickerView.WHEEL_TYPE.FLOWER)
                 .density(12)
