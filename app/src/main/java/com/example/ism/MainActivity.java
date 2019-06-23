@@ -31,6 +31,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -306,11 +307,15 @@ public class MainActivity extends Activity {
     }
 
     public void showToolPicker() {
-        String[] tools = {"Brush", "Filler", "Fill the drawn shape", "Eraser"};
+        // String[] tools = {"Brush", "Filler", "Fill the drawn shape", "Eraser"};
+
+        final String [] items = new String[] {"Brush", "Filler", "Fill the drawn shape", "Eraser"};
+        final Integer[] icons = new Integer[] {R.drawable.ic_tool_brush, R.drawable.ic_tool_filler,R.drawable.ic_tool_fill_the_drawn_shape, R.drawable.ic_tool_eraser};
+        ListAdapter adapter = new ArrayAdapterWithIcon(MainActivity.this, items, icons);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setTitle("Select a tool")
-                .setItems(tools, new DialogInterface.OnClickListener() {
+        builder.setTitle("Tools")
+                .setAdapter(adapter, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 
                         if (which != 3) drawView.setStyle(which);
@@ -322,14 +327,18 @@ public class MainActivity extends Activity {
     }
 
     public void showShapePicker() {
-        final String[] tools = {"Line", "Rectangle", "Oval"};
+        // final String[] tools = {"Line", "Rectangle", "Oval"};
+
+        final String [] items = new String[] {"Line", "Rectangle", "Oval"};
+        final Integer[] icons = new Integer[] {R.drawable.ic_shape_line,R.drawable.ic_shape_rectangle,R.drawable.ic_shape_oval};
+        ListAdapter adapter = new ArrayAdapterWithIcon(MainActivity.this, items, icons);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-        builder.setTitle("Select a shape")
-                .setItems(tools, new DialogInterface.OnClickListener() {
+        builder.setTitle("Shapes")
+                .setAdapter(adapter, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 
-                        drawView.setShape(tools[which]);
+                        drawView.setShape(items[which]);
                     }
                 });
         AlertDialog dialog = builder.create();
