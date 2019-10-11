@@ -16,6 +16,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Build;
@@ -54,6 +59,8 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import javax.xml.datatype.Duration;
@@ -77,6 +84,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     private double mAccel;
     private double mAccelCurrent;
     private double mAccelLast;
+    LocationManager locationManager;
+    GPSTracker gpsTracker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +93,12 @@ public class MainActivity extends Activity implements SensorEventListener {
 
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 2);
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 3);
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.INTERNET}, 4);
 
         setContentView(R.layout.activity_main);
         cLayout = findViewById(R.id.cLayout);
@@ -103,6 +118,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         }
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
+        this.gpsTracker = new GPSTracker(this);
     }
 
     /**
@@ -130,6 +146,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         ImageButton buttonSaveImageToFile = new ImageButton(this);
         ImageButton buttonStrokeColor = new ImageButton(this);
         ImageButton buttonStrokeWidth = new ImageButton(this);
+        ImageButton buttonSetLocation = new ImageButton(this);
 
         buttonSaveImageToFile.setImageResource(R.drawable.ic_save_dark);
         buttonOpenFile.setImageResource(R.drawable.ic_open_dark);
@@ -139,6 +156,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         buttonStrokeWidth.setImageResource(R.drawable.ic_width_dark);
         buttonTool.setImageResource(R.drawable.ic_tool_dark);
         buttonShape.setImageResource(R.drawable.ic_shape_dark);
+        buttonSetLocation.setImageResource(R.drawable.ic_gps_fixed_black_24dp);
 
         // ustawienie parametrów przycisków
         buttonStrokeColor.setLayoutParams(param);
@@ -149,7 +167,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         buttonSaveImageToFile.setLayoutParams(param);
         buttonShape.setLayoutParams(param);
         buttonCamera.setLayoutParams(param);
-
+        buttonSetLocation.setLayoutParams(param);
 
         // ustawienie listenerów na przyciskach
         buttonStrokeColor.setOnClickListener(new View.OnClickListener() {
@@ -227,6 +245,32 @@ public class MainActivity extends Activity implements SensorEventListener {
             }
         });
 
+        buttonSetLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                drawView.clearScreen();
+                String cityName = null;
+                Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
+                List<Address> addresses;
+
+                double lat = gpsTracker.getLatitude();
+                double lon = gpsTracker.getLongitude();
+                drawView.setText("Latitude: " + gpsTracker.getLatitude() + " Longitude: "
+                        + gpsTracker.getLongitude());
+                try {
+                    addresses = gcd.getFromLocation(gpsTracker.getLatitude(),
+                            gpsTracker.getLongitude(), 1);
+                    if (addresses.size() > 0) {
+                        cityName = addresses.get(0).getLocality();
+                        drawView.setText("Miasto:" + cityName);
+
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         // dodanie przycisków do layoutu
         lLayout.addView(buttonTool);
         lLayout.addView(buttonShape);
@@ -235,7 +279,7 @@ public class MainActivity extends Activity implements SensorEventListener {
         lLayout.addView(buttonOpenFile);
         lLayout.addView(buttonCamera);
         lLayout.addView(buttonSaveImageToFile);
-
+        lLayout.addView(buttonSetLocation);
         lLayout.addView(buttonClearScreen);
 
         // zagnieżdżenie (dodanie) layoutu z przyciskami w layoucie głównym
@@ -326,8 +370,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     public void showToolPicker() {
         // String[] tools = {"Brush", "Filler", "Fill the drawn shape", "Eraser"};
 
-        final String [] items = new String[] {"Brush", "Filler", "Fill the drawn shape", "Eraser"};
-        final Integer[] icons = new Integer[] {R.drawable.ic_tool_brush, R.drawable.ic_tool_filler,R.drawable.ic_tool_fill_the_drawn_shape, R.drawable.ic_tool_eraser};
+        final String[] items = new String[]{"Brush", "Filler", "Fill the drawn shape", "Eraser"};
+        final Integer[] icons = new Integer[]{R.drawable.ic_tool_brush, R.drawable.ic_tool_filler, R.drawable.ic_tool_fill_the_drawn_shape, R.drawable.ic_tool_eraser};
         ListAdapter adapter = new ArrayAdapterWithIcon(MainActivity.this, items, icons);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -346,8 +390,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     public void showShapePicker() {
         // final String[] tools = {"Line", "Rectangle", "Oval"};
 
-        final String [] items = new String[] {"Line", "Rectangle", "Oval"};
-        final Integer[] icons = new Integer[] {R.drawable.ic_shape_line,R.drawable.ic_shape_rectangle,R.drawable.ic_shape_oval};
+        final String[] items = new String[]{"Line", "Rectangle", "Oval"};
+        final Integer[] icons = new Integer[]{R.drawable.ic_shape_line, R.drawable.ic_shape_rectangle, R.drawable.ic_shape_oval};
         ListAdapter adapter = new ArrayAdapterWithIcon(MainActivity.this, items, icons);
 
         AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
@@ -439,6 +483,23 @@ public class MainActivity extends Activity implements SensorEventListener {
         }
         this.camera = true;
     }
+
+//    protected void drawLocation(Location location) {
+//        String cityName = null;
+//        Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
+//        List<Address> addresses;
+//        try {
+//            addresses = gcd.getFromLocation(location.getLatitude(),
+//                    location.getLongitude(), 1);
+//            if (addresses.size() > 0) {
+//                cityName = addresses.get(0).getLocality();
+//                drawView.setText("Koordynaty lat: " + location.getLatitude() + " Long: "
+//                        + location.getLongitude() + "Miasto:" + cityName);
+//            }
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
 
     /**
@@ -599,17 +660,17 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
 
             double x = event.values[0];
             double y = event.values[1];
             double z = event.values[2];
             mAccelLast = mAccelCurrent;
-            mAccelCurrent = Math.sqrt(x*x + y*y + z*z);
+            mAccelCurrent = Math.sqrt(x * x + y * y + z * z);
             double delta = mAccelCurrent - mAccelLast;
             mAccel = mAccel * 0.9f + delta;
 
-            if(mAccel > 30){
+            if (mAccel > 20) {
                 drawView.clearScreen();
             }
         }
@@ -631,5 +692,4 @@ public class MainActivity extends Activity implements SensorEventListener {
         super.onPause();
         sensorManager.unregisterListener(this);
     }
-
 }

@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
@@ -18,6 +19,7 @@ import android.os.Parcelable;
 import android.support.annotation.ColorLong;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -219,16 +221,15 @@ public class DrawView extends View {
 
     private void updateOval(float x, float y) {
 
-        float xChange = this.oval.right-x;
-        float yChange = this.oval.bottom-y;
+        float xChange = this.oval.right - x;
+        float yChange = this.oval.bottom - y;
 
-        tempOval.bottom = (float) (oval.bottom + (yChange*2));
-        tempOval.right = (float) (oval.right + (xChange*2));;
+        tempOval.bottom = (float) (oval.bottom + (yChange * 2));
+        tempOval.right = (float) (oval.right + (xChange * 2));
+        ;
 
         this.oval.bottom = (int) y;
         this.oval.right = (int) x;
-
-
 
     }
 
@@ -248,7 +249,7 @@ public class DrawView extends View {
             case MotionEvent.ACTION_DOWN:
                 mPath.reset();
 
-                if (! (this.strokeStyle == Paint.Style.FILL)) {
+                if (!(this.strokeStyle == Paint.Style.FILL)) {
                     switch (this.shape) {
                         case "Line":
                             mPath.moveTo(event.getX(), event.getY()); //ustal współrzędne początkowe ściężki na miejsce dotknięcia
@@ -268,7 +269,7 @@ public class DrawView extends View {
 
             case MotionEvent.ACTION_MOVE:
                 // rysuj linię po ścieżce ruchu palca
-                if (! (this.strokeStyle == Paint.Style.FILL)) {
+                if (!(this.strokeStyle == Paint.Style.FILL)) {
                     if (this.shape == "Line") drawLine(event.getX(), event.getY());
                     if (this.shape == "Rectangle") updateRectangle(event.getX(), event.getY());
                     if (this.shape == "Oval") {
@@ -287,7 +288,7 @@ public class DrawView extends View {
                 invalidate();
                 break;
             case MotionEvent.ACTION_UP:
-                if (! (this.strokeStyle == Paint.Style.FILL)) {
+                if (!(this.strokeStyle == Paint.Style.FILL)) {
                     // po oderwaniu palca od ekranu - zresetuj współrzędne ścieżki oraz narysuj okrąg
                     switch (this.shape) {
 
@@ -309,9 +310,7 @@ public class DrawView extends View {
                             this.tempOval = null;
                             break;
                     }
-                }
-                else
-                {
+                } else {
                     this.mCanvas.drawColor(this.strokeColor);
                 }
                 mPath.reset();
@@ -381,7 +380,7 @@ public class DrawView extends View {
 
     public void setShape(String shape) {
         this.shape = shape;
-        if (this.strokeStyle == Paint.Style.FILL) this.strokeStyle = Paint.Style.STROKE;;
+        if (this.strokeStyle == Paint.Style.FILL) this.strokeStyle = Paint.Style.STROKE;
         if (shape == "Line") this.setStyle(0);
         initPaint();
 
@@ -413,5 +412,16 @@ public class DrawView extends View {
      */
     public void setmBitmap(Bitmap mBitmap) {
         this.mBitmap = mBitmap;
+    }
+
+    public void setText(String text) {
+
+        Paint paint = new Paint();
+        paint.setStyle(Paint.Style.FILL);
+
+
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(40);
+        this.mCanvas.drawText(text, (float) getWidth() / 2, (float) getHeight() / 10, paint);
     }
 }
