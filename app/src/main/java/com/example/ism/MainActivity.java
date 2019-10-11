@@ -12,6 +12,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.net.Uri;
 import android.nfc.Tag;
 import android.os.Build;
@@ -53,7 +57,7 @@ import java.util.Set;
 
 import javax.xml.datatype.Duration;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements SensorEventListener {
 
     private DrawView drawView; // pole zawierające widok do rysowania
 
@@ -67,6 +71,8 @@ public class MainActivity extends Activity {
     Uri photoUri = null;
     AlertDialog.Builder builder;
     AlertDialog dialog = null;
+    private SensorManager sensorManager;
+    Sensor accelerometer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,6 +91,13 @@ public class MainActivity extends Activity {
         cLayout.addView(drawView);
 
         addButtons();
+
+        sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+        if (sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER) != null) {
+            accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        }
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
     }
 
@@ -579,5 +592,27 @@ public class MainActivity extends Activity {
         return image;
     }
 
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        Toast.makeText(MainActivity.this, "x: " + event.values[0] + "y: " + event.values[1] + "z: " + event.values[2], Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        sensorManager.unregisterListener(this);
+    }
 
 }
