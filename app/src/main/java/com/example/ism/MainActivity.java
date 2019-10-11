@@ -29,6 +29,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Layout;
+import android.util.FloatMath;
 import android.util.Log;
 import android.util.Size;
 import android.view.View;
@@ -73,6 +74,9 @@ public class MainActivity extends Activity implements SensorEventListener {
     AlertDialog dialog = null;
     private SensorManager sensorManager;
     Sensor accelerometer;
+    private double mAccel;
+    private double mAccelCurrent;
+    private double mAccelLast;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -595,7 +599,20 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-        Toast.makeText(MainActivity.this, "x: " + event.values[0] + "y: " + event.values[1] + "z: " + event.values[2], Toast.LENGTH_SHORT).show();
+        if (event.sensor.getType() == Sensor.TYPE_ACCELEROMETER){
+
+            double x = event.values[0];
+            double y = event.values[1];
+            double z = event.values[2];
+            mAccelLast = mAccelCurrent;
+            mAccelCurrent = Math.sqrt(x*x + y*y + z*z);
+            double delta = mAccelCurrent - mAccelLast;
+            mAccel = mAccel * 0.9f + delta;
+
+            if(mAccel > 30){
+                drawView.clearScreen();
+            }
+        }
     }
 
     @Override
