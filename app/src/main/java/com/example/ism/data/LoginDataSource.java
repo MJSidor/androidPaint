@@ -17,6 +17,7 @@ import java.io.IOException;
  */
 public class LoginDataSource {
     public Result<LoggedInUser> login(String username, String password) {
+        checkIfUserExists(username, password);
 
         if (checkIfUserExists(username, password)) {
             LoggedInUser admin =
@@ -39,13 +40,14 @@ public class LoginDataSource {
         DBHelper DBhelper = new DBHelper(MyApplication.getAppContext());
         SQLiteDatabase db = DBhelper.getReadableDatabase();
 
-        String Query = "Select * from " + DBhelper.TABLE_NAME + " where " + DBhelper.COLUMN1 + " = " + username + " and " + DBhelper.COLUMN2 + " = " + password;
-        Cursor cursor = db.rawQuery(Query, null);
-        if(cursor.getCount() <= 0){
-            cursor.close();
-            return false;
-        }
+        String[] columns = { DBhelper.COLUMN1, DBhelper.COLUMN2  };
+        String selection = DBhelper.COLUMN1 + " =? AND " + DBhelper.COLUMN2 + " =?";
+        String[] selectionArgs = { username, password };
+        String limit = "1";
+
+        Cursor cursor = db.query(DBhelper.TABLE_NAME, columns, selection, selectionArgs, null, null, null, limit);
+        boolean exists = (cursor.getCount() > 0);
         cursor.close();
-        return true;
+        return exists;
     }
 }
