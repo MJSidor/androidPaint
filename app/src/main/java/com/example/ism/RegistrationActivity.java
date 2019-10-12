@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.ism.ui.login.LoginActivity;
@@ -23,6 +24,13 @@ public class RegistrationActivity extends AppCompatActivity {
     Button registerButton;
     EditText username;
     EditText password;
+    TextView signInRedirect;
+
+    private int VALIDATION_STATE_USERNAME_TOO_SHORT = 1;
+    private int VALIDATION_STATE_PASSWORD_TOO_SHORT = 2;
+    private int VALIDATION_STATE_USERNAME_AND_PASSWORD_TOO_SHORT = 3;
+    private int VALIDATION_STATE_OK = 4;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +44,9 @@ public class RegistrationActivity extends AppCompatActivity {
 
         registerButton = findViewById(R.id.register);
 
+        signInRedirect = findViewById(R.id.textView2);
+
+
         registerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -43,11 +54,17 @@ public class RegistrationActivity extends AppCompatActivity {
             }
         });
 
-
+        signInRedirect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private void register() {
-        if (validate()) {
+        if (validate() == this.VALIDATION_STATE_OK) {
             if (checkIfUserExists(username.getText().toString())) {
                 Toast.makeText(getApplicationContext(), "User already exists", Toast.LENGTH_SHORT).show();
                 return;
@@ -60,12 +77,24 @@ public class RegistrationActivity extends AppCompatActivity {
             Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
             startActivity(intent);
         } else
-            Toast.makeText(getApplicationContext(), "Please enter valid data", Toast.LENGTH_SHORT).show();
-
+            if (validate() == this.VALIDATION_STATE_USERNAME_TOO_SHORT) {
+                Toast.makeText(getApplicationContext(), "Username must be at least 4 characters long", Toast.LENGTH_SHORT).show();
+            }
+            if (validate() == this.VALIDATION_STATE_PASSWORD_TOO_SHORT) {
+                Toast.makeText(getApplicationContext(), "Password must be at least 6 characters long", Toast.LENGTH_SHORT).show();
+            }
+            if (validate() == this.VALIDATION_STATE_USERNAME_AND_PASSWORD_TOO_SHORT) {
+                Toast.makeText(getApplicationContext(), "Username must be at least 4 characters long, password must be at least 6 characters long", Toast.LENGTH_SHORT).show();
+            }
     }
 
-    private boolean validate() {
-        return username.length() > 4 && password.length() > 5;
+    private int validate() {
+        if (username.length() >= 4 && password.length() >= 6) return this.VALIDATION_STATE_OK;
+        if (username.length() < 4 && password.length() >= 6) return this.VALIDATION_STATE_USERNAME_TOO_SHORT;
+        if (username.length() < 4 && password.length() < 6) return this.VALIDATION_STATE_USERNAME_AND_PASSWORD_TOO_SHORT;
+        if (username.length() >= 4 && password.length() < 6) return this.VALIDATION_STATE_PASSWORD_TOO_SHORT;
+
+        return 0;
     }
 
     public static boolean checkIfUserExists(String username) {
@@ -83,5 +112,4 @@ public class RegistrationActivity extends AppCompatActivity {
         cursor.close();
         return exists;
     }
-
 }

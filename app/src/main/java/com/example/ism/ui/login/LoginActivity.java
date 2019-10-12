@@ -22,13 +22,11 @@ import android.widget.Toast;
 import com.example.ism.MainActivity;
 import com.example.ism.R;
 import com.example.ism.RegistrationActivity;
-import com.example.ism.ui.login.LoginViewModel;
-import com.example.ism.ui.login.LoginViewModelFactory;
 
 public class LoginActivity extends AppCompatActivity {
 
     private LoginViewModel loginViewModel;
-    Button registerButton;
+    TextView registerRedirect;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -37,7 +35,7 @@ public class LoginActivity extends AppCompatActivity {
         loginViewModel = ViewModelProviders.of(this, new LoginViewModelFactory())
                 .get(LoginViewModel.class);
 
-        registerButton = findViewById(R.id.register_redirect);
+        registerRedirect = findViewById(R.id.register_redirect);
 
         final EditText usernameEditText = findViewById(R.id.username);
         final EditText passwordEditText = findViewById(R.id.password);
@@ -75,7 +73,6 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 setResult(Activity.RESULT_OK);
 
-                //Complete and destroy login activity once successful
                 finish();
             }
         });
@@ -120,7 +117,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        registerButton.setOnClickListener(new View.OnClickListener() {
+        registerRedirect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, RegistrationActivity.class);
@@ -137,5 +134,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void showLoginFailed(@StringRes Integer errorString) {
         Toast.makeText(getApplicationContext(), errorString, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(LoginActivity.this, LoginActivity.class);
+        startActivity(intent);
     }
 }

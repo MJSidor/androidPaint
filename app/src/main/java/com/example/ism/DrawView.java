@@ -41,8 +41,6 @@ public class DrawView extends View {
     private Rect rectangle = null;
     private RectF oval = null;
     private Paint eraserPaint;
-    private Canvas tempCanva;
-    private Bitmap tempBitmap;
 
     protected boolean restored = false; // zmienna pomocnicza służąca do określania,
     // czy urządzenie zostało właśnie obrócone
@@ -425,6 +423,7 @@ public class DrawView extends View {
 
         Paint paint = new Paint(Paint.DITHER_FLAG);
         paint.setColor(Color.TRANSPARENT);
+
         paint.setTextSize(80);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         this.mCanvas.drawText(text, (float) getWidth() / 2, (float) getHeight() / 10, paint);

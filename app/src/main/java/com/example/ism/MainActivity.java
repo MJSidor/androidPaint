@@ -648,7 +648,7 @@ public class MainActivity extends Activity implements SensorEventListener {
             double delta = mAccelCurrent - mAccelLast;
             mAccel = mAccel * 0.9f + delta;
 
-            if (mAccel > 20) {
+            if (mAccel > 15) {
                 drawView.clearScreen();
             }
         }
