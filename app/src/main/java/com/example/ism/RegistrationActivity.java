@@ -2,6 +2,7 @@ package com.example.ism;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -47,14 +48,17 @@ public class RegistrationActivity extends AppCompatActivity {
 
     private void register() {
         if (validate()) {
+            if (checkIfUserExists(username.getText().toString())) {
+                Toast.makeText(getApplicationContext(), "User already exists", Toast.LENGTH_SHORT).show();
+                return;
+            }
             ContentValues values = new ContentValues();
             values.put(DBHelper.COLUMN1, username.getText().toString());
-            values.put(DBHelper.COLUMN1, password.getText().toString());
+            values.put(DBHelper.COLUMN2, password.getText().toString());
             DB.insert(DBHelper.TABLE_NAME, null, values);
             Toast.makeText(getApplicationContext(), "Account created", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(RegistrationActivity.this, LoginActivity.class);
             startActivity(intent);
-
         } else
             Toast.makeText(getApplicationContext(), "Please enter valid data", Toast.LENGTH_SHORT).show();
 
@@ -62,6 +66,22 @@ public class RegistrationActivity extends AppCompatActivity {
 
     private boolean validate() {
         return username.length() > 4 && password.length() > 5;
+    }
+
+    public static boolean checkIfUserExists(String username) {
+
+        DBHelper DBhelper = new DBHelper(MyApplication.getAppContext());
+        SQLiteDatabase db = DBhelper.getReadableDatabase();
+
+        String[] columns = { DBhelper.COLUMN1  };
+        String selection = DBhelper.COLUMN1 + " =?";
+        String[] selectionArgs = { username };
+        String limit = "1";
+
+        Cursor cursor = db.query(DBhelper.TABLE_NAME, columns, selection, selectionArgs, null, null, null, limit);
+        boolean exists = (cursor.getCount() > 0);
+        cursor.close();
+        return exists;
     }
 
 }
