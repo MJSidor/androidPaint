@@ -17,7 +17,11 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.ColorLong;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
+import android.text.Layout;
+import android.text.StaticLayout;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.Display;
 import android.view.MotionEvent;
@@ -415,13 +419,14 @@ public class DrawView extends View {
     }
 
     public void setText(String text) {
+        setDrawingCacheEnabled(false);
+        invalidate();
+        setDrawingCacheEnabled(true);
 
-        Paint paint = new Paint();
-        paint.setStyle(Paint.Style.FILL);
-
-
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(40);
+        Paint paint = new Paint(Paint.DITHER_FLAG);
+        paint.setColor(Color.TRANSPARENT);
+        paint.setTextSize(80);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         this.mCanvas.drawText(text, (float) getWidth() / 2, (float) getHeight() / 10, paint);
     }
 }

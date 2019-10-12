@@ -11,7 +11,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -19,10 +18,7 @@ import android.hardware.SensorManager;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -32,38 +28,30 @@ import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
-import android.support.v7.app.AppCompatActivity;
-import android.text.Layout;
-import android.util.FloatMath;
 import android.util.Log;
-import android.util.Size;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.SeekBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.flask.colorpicker.ColorPickerView;
 import com.flask.colorpicker.OnColorSelectedListener;
 import com.flask.colorpicker.builder.ColorPickerClickListener;
 import com.flask.colorpicker.builder.ColorPickerDialogBuilder;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.File;
 import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
-
-import javax.xml.datatype.Duration;
 
 public class MainActivity extends Activity implements SensorEventListener {
 
@@ -71,7 +59,6 @@ public class MainActivity extends Activity implements SensorEventListener {
 
     ConstraintLayout cLayout;
     LinearLayout lLayout;
-    Bitmap bmp;
     int brushWidth;
     boolean fileOpen = false;
     boolean camera = false;
@@ -84,8 +71,8 @@ public class MainActivity extends Activity implements SensorEventListener {
     private double mAccel;
     private double mAccelCurrent;
     private double mAccelLast;
-    LocationManager locationManager;
-    GPSTracker gpsTracker;
+    private FusedLocationProviderClient fusedLocationClient;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,6 +86,9 @@ public class MainActivity extends Activity implements SensorEventListener {
                 new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 3);
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.INTERNET}, 4);
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
 
         setContentView(R.layout.activity_main);
         cLayout = findViewById(R.id.cLayout);
@@ -117,8 +107,6 @@ public class MainActivity extends Activity implements SensorEventListener {
             accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         }
         sensorManager.registerListener(this, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-
-        this.gpsTracker = new GPSTracker(this);
     }
 
     /**
@@ -248,26 +236,34 @@ public class MainActivity extends Activity implements SensorEventListener {
         buttonSetLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                drawView.clearScreen();
-                String cityName = null;
-                Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
-                List<Address> addresses;
+                fusedLocationClient.getLastLocation()
+                        .addOnSuccessListener(MainActivity.this, new OnSuccessListener<Location>() {
+                            @Override
+                            public void onSuccess(Location location) {
 
-                double lat = gpsTracker.getLatitude();
-                double lon = gpsTracker.getLongitude();
-                drawView.setText("Latitude: " + gpsTracker.getLatitude() + " Longitude: "
-                        + gpsTracker.getLongitude());
-                try {
-                    addresses = gcd.getFromLocation(gpsTracker.getLatitude(),
-                            gpsTracker.getLongitude(), 1);
-                    if (addresses.size() > 0) {
-                        cityName = addresses.get(0).getLocality();
-                        drawView.setText("Miasto:" + cityName);
+                                if (location != null) {
+                                    double longitude = location.getLongitude();
+                                    double latitude = location.getLatitude();
 
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                                    String cityName = null;
+                                    Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
+                                    List<Address> addresses;
+                                    try {
+                                        addresses = gcd.getFromLocation(latitude,
+                                                longitude, 1);
+                                        if (addresses.size() > 0) {
+                                            cityName = addresses.get(0).getLocality();
+                                            String country = addresses.get(0).getCountryCode();
+                                            drawView.setText(cityName + ", " + country);
+
+                                        }
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            }
+                        });
+
             }
         });
 
@@ -483,24 +479,6 @@ public class MainActivity extends Activity implements SensorEventListener {
         }
         this.camera = true;
     }
-
-//    protected void drawLocation(Location location) {
-//        String cityName = null;
-//        Geocoder gcd = new Geocoder(getBaseContext(), Locale.getDefault());
-//        List<Address> addresses;
-//        try {
-//            addresses = gcd.getFromLocation(location.getLatitude(),
-//                    location.getLongitude(), 1);
-//            if (addresses.size() > 0) {
-//                cityName = addresses.get(0).getLocality();
-//                drawView.setText("Koordynaty lat: " + location.getLatitude() + " Long: "
-//                        + location.getLongitude() + "Miasto:" + cityName);
-//            }
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
 
     /**
      * Metoda wywoływana przy obrocie urządzenia
